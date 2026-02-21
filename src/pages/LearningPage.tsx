@@ -346,7 +346,7 @@ export default function LearningPage() {
               <CardContent className="mt-auto space-y-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
-                  <span>{material.duration_min} РјРёРЅ.</span>
+                  <span>{material.duration_min} мин.</span>
                 </div>
                 {progress && (
                   <div className="space-y-1">
@@ -419,7 +419,7 @@ export default function LearningPage() {
                           <CardDescription className="text-xs">{lesson.goal}</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-2">
-                          <p className="text-xs text-muted-foreground">{lesson.durationMin} РјРёРЅ.</p>
+                          <p className="text-xs text-muted-foreground">{lesson.durationMin} мин.</p>
                           {isCompletedLesson ? (
                             <Badge className="bg-green-100 text-green-800">Р—Р°РІРµСЂС€РµРЅРѕ</Badge>
                           ) : (
