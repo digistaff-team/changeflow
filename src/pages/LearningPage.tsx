@@ -556,7 +556,7 @@ export default function LearningPage() {
                     }
                   }}
                 >
-                  РћС‚РєСЂС‹С‚СЊ
+                  {'\u041e\u0442\u043a\u0440\u044b\u0442\u044c'}
                 </Button>
               </CardContent>
             </Card>
@@ -602,7 +602,7 @@ export default function LearningPage() {
                         <CardContent className="space-y-2">
                           <p className="text-xs text-muted-foreground">{lesson.durationMin} РјРёРЅ.</p>
                           {isCompletedLesson && (
-                            <Badge className="bg-green-100 text-green-800">Р—Р°РІРµСЂС€РµРЅРѕ</Badge>
+                            <Badge className="bg-green-100 text-green-800">{'\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e'}</Badge>
                           )}
                             <Button
                               size="sm"
@@ -610,7 +610,9 @@ export default function LearningPage() {
                               disabled={!isUnlocked}
                               onClick={() => setActiveLessonIndex(index)}
                             >
-                              {isUnlocked ? 'РћС‚РєСЂС‹С‚СЊ Р·Р°РЅСЏС‚РёРµ' : 'Р—Р°Р±Р»РѕРєРёСЂРѕРІР°РЅРѕ'}
+                              {isUnlocked
+                                ? '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0437\u0430\u043d\u044f\u0442\u0438\u0435'
+                                : '\u0417\u0430\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u043e'}
                             </Button>
                         </CardContent>
                       </Card>
@@ -652,7 +654,7 @@ export default function LearningPage() {
                                   className="w-full"
                                   onClick={() => window.open(media.url, '_blank', 'noopener,noreferrer')}
                                 >
-                                  РћС‚РєСЂС‹С‚СЊ СЂРµСЃСѓСЂСЃ
+                                  {'\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0440\u0435\u0441\u0443\u0440\u0441'}
                                 </Button>
                               </CardContent>
                             </Card>
@@ -670,7 +672,9 @@ export default function LearningPage() {
                       </ul>
                     </div>
                     {!completedLessonSet.has(activeLessonIndex) && (
-                      <Button onClick={() => completeLesson(activeLessonIndex)}>Р—Р°РІРµСЂС€РёС‚СЊ Р·Р°РЅСЏС‚РёРµ</Button>
+                      <Button onClick={() => completeLesson(activeLessonIndex)}>
+                        {'\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c \u0437\u0430\u043d\u044f\u0442\u0438\u0435'}
+                      </Button>
                     )}
                   </CardContent>
                 </Card>
@@ -684,7 +688,9 @@ export default function LearningPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {!allLessonsCompleted && (
-                      <Badge variant="secondary">РЎРЅР°С‡Р°Р»Р° Р·Р°РІРµСЂС€РёС‚Рµ РІСЃРµ Р·Р°РЅСЏС‚РёСЏ РїРѕ РїРѕСЂСЏРґРєСѓ</Badge>
+                      <Badge variant="secondary">
+                        {'\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u0435 \u0432\u0441\u0435 \u0437\u0430\u043d\u044f\u0442\u0438\u044f \u043f\u043e \u043f\u043e\u0440\u044f\u0434\u043a\u0443'}
+                      </Badge>
                     )}
 
                     {allLessonsCompleted && (
@@ -708,16 +714,18 @@ export default function LearningPage() {
                           </div>
                         ))}
 
-                        <Button onClick={submitQuiz}>РџСЂРѕРІРµСЂРёС‚СЊ РєРІРёР·</Button>
+                        <Button onClick={submitQuiz}>{'\u041f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u043a\u0432\u0438\u0437'}</Button>
 
                         {quizScore !== null && (
                           quizScore >= activeCourse.quiz.passScore ? (
                             <Badge className="bg-green-100 text-green-800">
-                              РљРІРёР· РїСЂРѕР№РґРµРЅ: {quizScore}%. РљСѓСЂСЃ Р·Р°РІРµСЂС€РµРЅ.
+                              {'\u041a\u0432\u0438\u0437 \u043f\u0440\u043e\u0439\u0434\u0435\u043d'}: {quizScore}%.
+                              {' \u041a\u0443\u0440\u0441 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d.'}
                             </Badge>
                           ) : (
                             <Badge variant="destructive">
-                              РљРІРёР· РЅРµ РїСЂРѕР№РґРµРЅ: {quizScore}%. РџРѕРІС‚РѕСЂРёС‚Рµ Рё РїРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°.
+                              {'\u041a\u0432\u0438\u0437 \u043d\u0435 \u043f\u0440\u043e\u0439\u0434\u0435\u043d'}: {quizScore}%.
+                              {' \u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u0438 \u043f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0441\u043d\u043e\u0432\u0430.'}
                             </Badge>
                           )
                         )}
