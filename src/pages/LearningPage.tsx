@@ -82,8 +82,11 @@ export default function LearningPage() {
             <Card key={material.id} className="flex flex-col">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                     <Icon className="h-5 w-5 text-primary" />
+                    {isCompleted && (
+                      <CheckCircle2 className="absolute -top-1.5 -right-1.5 h-4 w-4 text-green-600 bg-background rounded-full" />
+                    )}
                   </div>
                   <div className="flex gap-1">
                     <Badge variant="secondary" className="text-xs">{typeLabels[material.content_type]}</Badge>
@@ -104,20 +107,12 @@ export default function LearningPage() {
                     <p className="text-xs text-muted-foreground">{progress.progress_percent}%</p>
                   </div>
                 )}
-                {isCompleted ? (
-                  <Badge className="bg-green-100 text-green-800 w-full justify-center">
-                    <CheckCircle2 className="h-3 w-3 mr-1" /> Пройдено
-                  </Badge>
-                ) : progress ? (
-                  <Button size="sm" className="w-full" onClick={() => handleComplete(material.id)}>Завершить</Button>
-                ) : (
-                  <Button size="sm" variant="outline" className="w-full" onClick={() => {
+                <Button size="sm" variant="outline" className="w-full" onClick={() => {
                     handleStart(material.id);
                     if (material.content_type === 'guide' || material.content_type === 'course') {
                       navigate(`/learning/course/${material.id}`);
                     }
-                  }}>Начать</Button>
-                )}
+                  }}>Открыть</Button>
               </CardContent>
             </Card>
           );
