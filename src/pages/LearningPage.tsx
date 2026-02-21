@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { mockLearningMaterials } from '@/data/mock-data';
@@ -6,18 +6,199 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { BookOpen, Video, FileText, CheckSquare, GraduationCap, Clock, CheckCircle2 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { BookOpen, Video, FileText, CheckSquare, GraduationCap, Clock, CheckCircle2, Lock } from 'lucide-react';
+
+type CourseLesson = {
+  id: string;
+  title: string;
+  goal: string;
+  content: string;
+  durationMin: number;
+  checklist: string[];
+};
+
+type CourseQuizQuestion = {
+  id: string;
+  question: string;
+  options: string[];
+  correctIndex: number;
+};
+
+type StructuredCourse = {
+  materialId: string;
+  title: string;
+  methodology: string;
+  lessons: CourseLesson[];
+  quiz: {
+    title: string;
+    passScore: number;
+    questions: CourseQuizQuestion[];
+  };
+};
 
 const typeIcons: Record<string, React.ElementType> = {
-  article: FileText, video: Video, course: GraduationCap, guide: BookOpen, checklist: CheckSquare,
+  article: FileText,
+  video: Video,
+  course: GraduationCap,
+  guide: BookOpen,
+  checklist: CheckSquare,
+  instruction: BookOpen,
+  document: FileText,
 };
+
+const structuredCourses: Record<string, StructuredCourse> = {
+  lm2: {
+    materialId: 'lm2',
+    title: '8 шагов Коттера для трансформации',
+    methodology: 'Практико-ориентированный формат: 5 последовательных занятий + итоговый квиз.',
+    lessons: [
+      {
+        id: 'kotter-1',
+        title: 'Занятие 1. Срочность и коалиция изменений',
+        goal: 'Сформировать ощущение срочности и собрать команду проводников изменений.',
+        content:
+          'Разберите причины трансформации, ключевые риски бездействия и роли лидеров изменений. Зафиксируйте состав коалиции и зоны ответственности.',
+        durationMin: 35,
+        checklist: [
+          'Сформулированы 3-5 причин срочности',
+          'Определены ключевые стейкхолдеры',
+          'Назначен владелец трансформации',
+        ],
+      },
+      {
+        id: 'kotter-2',
+        title: 'Занятие 2. Видение и стратегия изменений',
+        goal: 'Собрать понятное видение целевого состояния и маршрут перехода.',
+        content:
+          'Опишите целевую модель работы, критерии успеха и этапы внедрения. Убедитесь, что стратегия реализуема в сроках и ресурсах.',
+        durationMin: 40,
+        checklist: [
+          'Сформулировано единое видение',
+          'Определены KPI трансформации',
+          'Разложены этапы и контрольные точки',
+        ],
+      },
+      {
+        id: 'kotter-3',
+        title: 'Занятие 3. Коммуникация и вовлечение',
+        goal: 'Снизить сопротивление через системную коммуникацию и участие команды.',
+        content:
+          'Подготовьте карту коммуникаций: кому, что, когда и в каком формате сообщаем. Определите каналы обратной связи и шаблоны ответов на возражения.',
+        durationMin: 45,
+        checklist: [
+          'Готов план коммуникаций',
+          'Определены частые возражения и ответы',
+          'Назначены ответственные за коммуникации',
+        ],
+      },
+      {
+        id: 'kotter-4',
+        title: 'Занятие 4. Быстрые победы и устранение барьеров',
+        goal: 'Показать первые результаты и снять организационные ограничения.',
+        content:
+          'Выберите короткие инициативы с измеримым эффектом, зафиксируйте барьеры и план их устранения. Договоритесь о публичной фиксации быстрых побед.',
+        durationMin: 40,
+        checklist: [
+          'Определены 2-3 быстрые победы',
+          'Составлен реестр барьеров',
+          'Утверждены действия по снятию барьеров',
+        ],
+      },
+      {
+        id: 'kotter-5',
+        title: 'Занятие 5. Масштабирование и закрепление в культуре',
+        goal: 'Перевести изменения в стандарт работы и корпоративные практики.',
+        content:
+          'Сформируйте план масштабирования, обновите регламенты и привяжите новые практики к системе оценки эффективности и обучению новых сотрудников.',
+        durationMin: 45,
+        checklist: [
+          'Согласован план масштабирования',
+          'Обновлены регламенты и роли',
+          'Встроен контроль устойчивости изменений',
+        ],
+      },
+    ],
+    quiz: {
+      title: 'Итоговый квиз по 8 шагам Коттера',
+      passScore: 80,
+      questions: [
+        {
+          id: 'q1',
+          question: 'С чего начинается модель Коттера?',
+          options: ['С формирования видения', 'С создания ощущения срочности', 'С масштабирования изменений'],
+          correctIndex: 1,
+        },
+        {
+          id: 'q2',
+          question: 'Зачем нужны «быстрые победы»?',
+          options: ['Чтобы сократить бюджет', 'Чтобы повысить доверие к изменениям', 'Чтобы отменить коммуникации'],
+          correctIndex: 1,
+        },
+        {
+          id: 'q3',
+          question: 'Когда изменения считаются закрепленными?',
+          options: ['Когда есть один успешный пилот', 'Когда практики встроены в культуру и стандарты', 'Когда проект закрыт формально'],
+          correctIndex: 1,
+        },
+        {
+          id: 'q4',
+          question: 'Кто отвечает за устойчивость изменений?',
+          options: ['Только HR', 'Только руководитель проекта', 'Коалиция лидеров и линейные руководители'],
+          correctIndex: 2,
+        },
+        {
+          id: 'q5',
+          question: 'Что критично для шага коммуникации?',
+          options: ['Единые сообщения и регулярная обратная связь', 'Разовая рассылка', 'Коммуникации только для топ-менеджмента'],
+          correctIndex: 0,
+        },
+      ],
+    },
+  },
+};
+
 export default function LearningPage() {
-  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
 
+  const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
+  const [completedLessonsByCourse, setCompletedLessonsByCourse] = useState<Record<string, number[]>>({});
+  const [activeLessonIndex, setActiveLessonIndex] = useState(0);
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
+  const [quizScore, setQuizScore] = useState<number | null>(null);
+
+  const userId = user?.id || 'u1';
+
   const getUserProgress = (materialId: string) => {
-    return learningProgress.find(lp => lp.user_id === user?.id && lp.material_id === materialId);
+    return learningProgress.find((lp) => lp.user_id === userId && lp.material_id === materialId);
+  };
+
+  const upsertLearningProgress = (materialId: string, progressPercent: number, isCompleted = false) => {
+    const existing = getUserProgress(materialId);
+    const now = new Date().toISOString();
+
+    if (existing) {
+      updateLearningProgress(existing.id, {
+        progress_percent: Math.max(existing.progress_percent, progressPercent),
+        completed_at: isCompleted ? now : existing.completed_at,
+      });
+      return;
+    }
+
+    addLearningProgress({
+      id: 'ulp' + Date.now(),
+      user_id: userId,
+      material_id: materialId,
+      progress_percent: progressPercent,
+      completed_at: isCompleted ? now : undefined,
+    });
   };
 
   const handleStart = (materialId: string) => {
@@ -25,7 +206,7 @@ export default function LearningPage() {
     if (!existing) {
       addLearningProgress({
         id: 'ulp' + Date.now(),
-        user_id: user?.id || 'u1',
+        user_id: userId,
         material_id: materialId,
         progress_percent: 10,
       });
@@ -33,22 +214,92 @@ export default function LearningPage() {
   };
 
   const handleComplete = (materialId: string) => {
+    upsertLearningProgress(materialId, 100, true);
+  };
+
+  const openStructuredCourse = (materialId: string) => {
+    const course = structuredCourses[materialId];
+    if (!course) return;
+
+    const completedLessons = completedLessonsByCourse[materialId] ?? [];
+    const nextLessonIndex = course.lessons.findIndex((_, index) => !completedLessons.includes(index));
+
+    setActiveCourseId(materialId);
+    setActiveLessonIndex(nextLessonIndex === -1 ? course.lessons.length - 1 : nextLessonIndex);
+    setQuizAnswers({});
+    setQuizScore(null);
+
     const existing = getUserProgress(materialId);
-    if (existing) {
-      updateLearningProgress(existing.id, { progress_percent: 100, completed_at: new Date().toISOString() });
-    } else {
-      addLearningProgress({
-        id: 'ulp' + Date.now(),
-        user_id: user?.id || 'u1',
-        material_id: materialId,
-        progress_percent: 100,
-        completed_at: new Date().toISOString(),
-      });
+    if (!existing) {
+      upsertLearningProgress(materialId, 5);
     }
   };
 
-  const completedCount = learningProgress.filter(lp => lp.user_id === user?.id && lp.completed_at).length;
-  const totalCount = mockLearningMaterials.filter(m => m.target_roles.includes(user?.role || 'employee')).length;
+  const closeStructuredCourse = () => {
+    setActiveCourseId(null);
+    setQuizAnswers({});
+    setQuizScore(null);
+  };
+
+  const activeCourse = activeCourseId ? structuredCourses[activeCourseId] : null;
+  const completedLessons = useMemo(
+    () => (activeCourseId ? completedLessonsByCourse[activeCourseId] ?? [] : []),
+    [activeCourseId, completedLessonsByCourse],
+  );
+  const completedLessonSet = useMemo(() => new Set(completedLessons), [completedLessons]);
+  const allLessonsCompleted = !!activeCourse && completedLessons.length === activeCourse.lessons.length;
+
+  const isLessonUnlocked = (lessonIndex: number) => {
+    if (lessonIndex === 0) return true;
+    return completedLessonSet.has(lessonIndex - 1);
+  };
+
+  const completeLesson = (lessonIndex: number) => {
+    if (!activeCourseId || !activeCourse || !isLessonUnlocked(lessonIndex)) return;
+
+    setCompletedLessonsByCourse((prev) => {
+      const currentLessons = prev[activeCourseId] ?? [];
+      if (currentLessons.includes(lessonIndex)) return prev;
+
+      const nextLessons = [...currentLessons, lessonIndex].sort((a, b) => a - b);
+      const progressPercent = Math.round((nextLessons.length / (activeCourse.lessons.length + 1)) * 100);
+      upsertLearningProgress(activeCourseId, progressPercent);
+
+      return {
+        ...prev,
+        [activeCourseId]: nextLessons,
+      };
+    });
+
+    if (activeCourse.lessons[lessonIndex + 1]) {
+      setActiveLessonIndex(lessonIndex + 1);
+    }
+  };
+
+  const submitQuiz = () => {
+    if (!activeCourseId || !activeCourse) return;
+
+    const totalQuestions = activeCourse.quiz.questions.length;
+    if (Object.keys(quizAnswers).length < totalQuestions) return;
+
+    const correctAnswers = activeCourse.quiz.questions.reduce((sum, question) => {
+      return sum + (quizAnswers[question.id] === question.correctIndex ? 1 : 0);
+    }, 0);
+
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+    setQuizScore(score);
+
+    if (score >= activeCourse.quiz.passScore) {
+      upsertLearningProgress(activeCourseId, 100, true);
+      return;
+    }
+
+    const currentLessonProgress = Math.round((activeCourse.lessons.length / (activeCourse.lessons.length + 1)) * 100);
+    upsertLearningProgress(activeCourseId, currentLessonProgress);
+  };
+
+  const completedCount = learningProgress.filter((lp) => lp.user_id === userId && lp.completed_at).length;
+  const totalCount = mockLearningMaterials.filter((m) => m.target_roles.includes(user?.role || 'employee')).length;
 
   return (
     <div className="p-6 space-y-6">
@@ -69,20 +320,18 @@ export default function LearningPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {mockLearningMaterials.map(material => {
+        {mockLearningMaterials.map((material) => {
           const Icon = typeIcons[material.content_type] || BookOpen;
           const progress = getUserProgress(material.id);
           const isCompleted = !!progress?.completed_at;
+          const hasStructuredCourse = !!structuredCourses[material.id];
 
           return (
             <Card key={material.id} className="flex flex-col">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
-                  <div className="relative flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10">
                     <Icon className="h-5 w-5 text-primary" />
-                    {isCompleted && (
-                      <CheckCircle2 className="absolute -top-1.5 -right-1.5 h-4 w-4 text-green-600 bg-background rounded-full" />
-                    )}
                   </div>
                   <div className="flex gap-1">
                     <Badge variant="outline" className="text-xs">{material.category}</Badge>
@@ -102,17 +351,162 @@ export default function LearningPage() {
                     <p className="text-xs text-muted-foreground">{progress.progress_percent}%</p>
                   </div>
                 )}
-                <Button size="sm" variant="outline" className="w-full" onClick={() => {
-                    handleStart(material.id);
-                    if (material.content_type === 'guide' || material.content_type === 'course') {
-                      navigate(`/learning/course/${material.id}`);
-                    }
-                  }}>Открыть</Button>
+
+                {isCompleted ? (
+                  <Badge className="bg-green-100 text-green-800 w-full justify-center">
+                    <CheckCircle2 className="h-3 w-3 mr-1" /> Пройдено
+                  </Badge>
+                ) : hasStructuredCourse ? (
+                  <Button
+                    size="sm"
+                    className="w-full"
+                    variant={progress ? 'default' : 'outline'}
+                    onClick={() => openStructuredCourse(material.id)}
+                  >
+                    {progress ? 'Продолжить курс' : 'Начать курс'}
+                  </Button>
+                ) : progress ? (
+                  <Button size="sm" className="w-full" onClick={() => handleComplete(material.id)}>Завершить</Button>
+                ) : (
+                  <Button size="sm" variant="outline" className="w-full" onClick={() => handleStart(material.id)}>Начать</Button>
+                )}
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      <Dialog open={!!activeCourse} onOpenChange={(open) => (!open ? closeStructuredCourse() : undefined)}>
+        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
+          {activeCourse && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{activeCourse.title}</DialogTitle>
+                <DialogDescription>{activeCourse.methodology}</DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                <div>
+                  <p className="text-sm font-medium mb-2">Прогресс курса</p>
+                  <Progress
+                    value={Math.round((completedLessons.length / (activeCourse.lessons.length + 1)) * 100)}
+                    className="h-2"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  {activeCourse.lessons.map((lesson, index) => {
+                    const isCompletedLesson = completedLessonSet.has(index);
+                    const isUnlocked = isLessonUnlocked(index);
+
+                    return (
+                      <Card
+                        key={lesson.id}
+                        className={activeLessonIndex === index ? 'border-primary' : ''}
+                      >
+                        <CardHeader className="pb-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <CardTitle className="text-sm">{lesson.title}</CardTitle>
+                            {!isUnlocked && <Lock className="h-4 w-4 text-muted-foreground" />}
+                          </div>
+                          <CardDescription className="text-xs">{lesson.goal}</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <p className="text-xs text-muted-foreground">{lesson.durationMin} мин.</p>
+                          {isCompletedLesson ? (
+                            <Badge className="bg-green-100 text-green-800">Завершено</Badge>
+                          ) : (
+                            <Button
+                              size="sm"
+                              variant={isUnlocked ? 'outline' : 'secondary'}
+                              disabled={!isUnlocked}
+                              onClick={() => setActiveLessonIndex(index)}
+                            >
+                              {isUnlocked ? 'Открыть занятие' : 'Заблокировано'}
+                            </Button>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">{activeCourse.lessons[activeLessonIndex].title}</CardTitle>
+                    <CardDescription>{activeCourse.lessons[activeLessonIndex].goal}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm">{activeCourse.lessons[activeLessonIndex].content}</p>
+                    <div>
+                      <p className="text-sm font-medium mb-2">Практические шаги:</p>
+                      <ul className="text-sm list-disc pl-5 space-y-1">
+                        {activeCourse.lessons[activeLessonIndex].checklist.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    {!completedLessonSet.has(activeLessonIndex) && (
+                      <Button onClick={() => completeLesson(activeLessonIndex)}>Завершить занятие</Button>
+                    )}
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base">{activeCourse.quiz.title}</CardTitle>
+                    <CardDescription>
+                      Квиз станет доступен после завершения всех 5 занятий. Проходной балл: {activeCourse.quiz.passScore}%.
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {!allLessonsCompleted && (
+                      <Badge variant="secondary">Сначала завершите все занятия по порядку</Badge>
+                    )}
+
+                    {allLessonsCompleted && (
+                      <div className="space-y-4">
+                        {activeCourse.quiz.questions.map((question, index) => (
+                          <div key={question.id} className="space-y-2">
+                            <p className="text-sm font-medium">{index + 1}. {question.question}</p>
+                            <div className="flex flex-col gap-2">
+                              {question.options.map((option, optionIndex) => (
+                                <Button
+                                  key={option}
+                                  type="button"
+                                  variant={quizAnswers[question.id] === optionIndex ? 'default' : 'outline'}
+                                  className="justify-start h-auto whitespace-normal"
+                                  onClick={() => setQuizAnswers((prev) => ({ ...prev, [question.id]: optionIndex }))}
+                                >
+                                  {option}
+                                </Button>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+
+                        <Button onClick={submitQuiz}>Проверить квиз</Button>
+
+                        {quizScore !== null && (
+                          quizScore >= activeCourse.quiz.passScore ? (
+                            <Badge className="bg-green-100 text-green-800">
+                              Квиз пройден: {quizScore}%. Курс завершен.
+                            </Badge>
+                          ) : (
+                            <Badge variant="destructive">
+                              Квиз не пройден: {quizScore}%. Повторите и попробуйте снова.
+                            </Badge>
+                          )
+                        )}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
