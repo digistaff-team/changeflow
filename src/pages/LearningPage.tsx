@@ -340,6 +340,14 @@ export default function LearningPage() {
 
   const userId = user?.id || 'u1';
 
+  const buildCompletedLessonsFromPercent = (materialId: string, progressPercent?: number) => {
+    const course = structuredCourses[materialId];
+    if (!course) return [];
+    const boundedPercent = Math.max(0, Math.min(100, progressPercent ?? 0));
+    const completedCount = Math.floor((boundedPercent / 100) * course.lessons.length);
+    return Array.from({ length: completedCount }, (_, index) => index);
+  };
+
   const getUserProgress = (materialId: string) => {
     return learningProgress.find((lp) => lp.user_id === userId && lp.material_id === materialId);
   };
@@ -385,18 +393,22 @@ export default function LearningPage() {
     const course = structuredCourses[materialId];
     if (!course) return;
 
-    const completedLessons = completedLessonsByCourse[materialId] ?? [];
+    const existing = getUserProgress(materialId);
+    const completedLessons =
+      completedLessonsByCourse[materialId] ?? buildCompletedLessonsFromPercent(materialId, existing?.progress_percent);
     const nextLessonIndex = course.lessons.findIndex((_, index) => !completedLessons.includes(index));
 
+    setCompletedLessonsByCourse((prev) => {
+      if (prev[materialId]) return prev;
+      return {
+        ...prev,
+        [materialId]: completedLessons,
+      };
+    });
     setActiveCourseId(materialId);
     setActiveLessonIndex(nextLessonIndex === -1 ? course.lessons.length - 1 : nextLessonIndex);
     setQuizAnswers({});
     setQuizScore(null);
-
-    const existing = getUserProgress(materialId);
-    if (!existing) {
-      upsertLearningProgress(materialId, 5);
-    }
   };
 
   const closeStructuredCourse = () => {
@@ -426,7 +438,7 @@ export default function LearningPage() {
       if (currentLessons.includes(lessonIndex)) return prev;
 
       const nextLessons = [...currentLessons, lessonIndex].sort((a, b) => a - b);
-      const progressPercent = Math.round((nextLessons.length / (activeCourse.lessons.length + 1)) * 100);
+      const progressPercent = Math.round((nextLessons.length / activeCourse.lessons.length) * 100);
       upsertLearningProgress(activeCourseId, progressPercent);
 
       return {
@@ -458,7 +470,7 @@ export default function LearningPage() {
       return;
     }
 
-    const currentLessonProgress = Math.round((activeCourse.lessons.length / (activeCourse.lessons.length + 1)) * 100);
+    const currentLessonProgress = Math.round((completedLessons.length / activeCourse.lessons.length) * 100);
     upsertLearningProgress(activeCourseId, currentLessonProgress);
   };
 
@@ -489,6 +501,11 @@ export default function LearningPage() {
           const progress = getUserProgress(material.id);
           const isCompleted = !!progress?.completed_at;
           const hasStructuredCourse = !!structuredCourses[material.id];
+          const completedLessonIndexes = completedLessonsByCourse[material.id];
+          const lessonBasedProgress = hasStructuredCourse && completedLessonIndexes
+            ? Math.round((completedLessonIndexes.length / structuredCourses[material.id].lessons.length) * 100)
+            : undefined;
+          const displayProgressPercent = lessonBasedProgress ?? progress?.progress_percent;
 
           return (
             <Card key={material.id} className="flex flex-col">
@@ -512,10 +529,10 @@ export default function LearningPage() {
                   <Clock className="h-3 w-3" />
                   <span>{material.duration_min} мин.</span>
                 </div>
-                {progress && (
+                {displayProgressPercent !== undefined && (
                   <div className="space-y-1">
-                    <Progress value={progress.progress_percent} className="h-1.5" />
-                    <p className="text-xs text-muted-foreground">{progress.progress_percent}%</p>
+                    <Progress value={displayProgressPercent} className="h-1.5" />
+                    <p className="text-xs text-muted-foreground">{displayProgressPercent}%</p>
                   </div>
                 )}
 
@@ -560,7 +577,7 @@ export default function LearningPage() {
                 <div>
                   <p className="text-sm font-medium mb-2">Прогресс курса</p>
                   <Progress
-                    value={Math.round((completedLessons.length / (activeCourse.lessons.length + 1)) * 100)}
+                    value={Math.round((completedLessons.length / activeCourse.lessons.length) * 100)}
                     className="h-2"
                   />
                 </div>
