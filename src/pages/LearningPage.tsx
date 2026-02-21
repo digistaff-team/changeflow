@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { mockLearningMaterials } from '@/data/mock-data';
@@ -15,6 +16,7 @@ const typeLabels: Record<string, string> = {
 };
 
 export default function LearningPage() {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
 
@@ -109,7 +111,12 @@ export default function LearningPage() {
                 ) : progress ? (
                   <Button size="sm" className="w-full" onClick={() => handleComplete(material.id)}>Завершить</Button>
                 ) : (
-                  <Button size="sm" variant="outline" className="w-full" onClick={() => handleStart(material.id)}>Начать</Button>
+                  <Button size="sm" variant="outline" className="w-full" onClick={() => {
+                    handleStart(material.id);
+                    if (material.content_type === 'guide' || material.content_type === 'course') {
+                      navigate(`/learning/course/${material.id}`);
+                    }
+                  }}>Начать</Button>
                 )}
               </CardContent>
             </Card>

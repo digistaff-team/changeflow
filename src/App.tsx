@@ -14,6 +14,7 @@ import ProjectDetailPage from "@/pages/ProjectDetailPage";
 import FeedbackPage from "@/pages/FeedbackPage";
 import AiAssistantPage from "@/pages/AiAssistantPage";
 import LearningPage from "@/pages/LearningPage";
+import CoursePage from "@/pages/CoursePage";
 import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/NotFound";
 
@@ -42,6 +43,7 @@ const App = () => (
           <Route path="/feedback" element={<ProtectedRoute><FeedbackPage /></ProtectedRoute>} />
           <Route path="/ai-assistant" element={<ProtectedRoute><AiAssistantPage /></ProtectedRoute>} />
           <Route path="/learning" element={<ProtectedRoute><LearningPage /></ProtectedRoute>} />
+          <Route path="/learning/course/:id" element={<ProtectedRoute><CoursePage /></ProtectedRoute>} />
           <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
