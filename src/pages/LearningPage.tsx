@@ -11,10 +11,6 @@ import { BookOpen, Video, FileText, CheckSquare, GraduationCap, Clock, CheckCirc
 const typeIcons: Record<string, React.ElementType> = {
   article: FileText, video: Video, course: GraduationCap, guide: BookOpen, checklist: CheckSquare,
 };
-const typeLabels: Record<string, string> = {
-  article: 'Статья', video: 'Видео', course: 'Курс', guide: 'Руководство', checklist: 'Чек-лист',
-};
-
 export default function LearningPage() {
   const navigate = useNavigate();
   const { user } = useAuthStore();
@@ -89,7 +85,6 @@ export default function LearningPage() {
                     )}
                   </div>
                   <div className="flex gap-1">
-                    <Badge variant="secondary" className="text-xs">{typeLabels[material.content_type]}</Badge>
                     <Badge variant="outline" className="text-xs">{material.category}</Badge>
                   </div>
                 </div>
