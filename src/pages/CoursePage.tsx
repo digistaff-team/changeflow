@@ -332,27 +332,33 @@ export default function CoursePage() {
 
       {/* Navigation tabs */}
       <div className="flex gap-2 flex-wrap">
-        {lessons.map((lesson, i) => (
-          <Button
-            key={lesson.id}
-            variant={activeLesson === i && !showQuest ? 'default' : 'outline'}
-            size="sm"
-            className="relative"
-            onClick={() => { setActiveLesson(i); setShowQuest(false); }}
-          >
-            {completedLessons.has(lesson.id) && (
-              <CheckCircle2 className="h-3 w-3 mr-1 text-green-500" />
-            )}
-            Занятие {lesson.id}
-          </Button>
-        ))}
+        {lessons.map((lesson, i) => {
+          const isLocked = i > 0 && !completedLessons.has(lessons[i - 1].id);
+          return (
+            <Button
+              key={lesson.id}
+              variant={activeLesson === i && !showQuest ? 'default' : 'outline'}
+              size="sm"
+              className="relative"
+              disabled={isLocked}
+              onClick={() => { setActiveLesson(i); setShowQuest(false); }}
+            >
+              {completedLessons.has(lesson.id) && (
+                <CheckCircle2 className="h-3 w-3 mr-1 text-green-500" />
+              )}
+              {isLocked && '🔒 '}
+              Занятие {lesson.id}
+            </Button>
+          );
+        })}
         <Button
           variant={showQuest ? 'default' : 'outline'}
           size="sm"
+          disabled={completedLessons.size < lessons.length}
           onClick={() => setShowQuest(true)}
         >
           <Trophy className="h-3 w-3 mr-1" />
-          Квест
+          {completedLessons.size < lessons.length ? '🔒 ' : ''}Квест
         </Button>
       </div>
 
@@ -402,7 +408,7 @@ export default function CoursePage() {
               <Button
                 variant="outline"
                 size="sm"
-                disabled={activeLesson === lessons.length - 1}
+                disabled={activeLesson === lessons.length - 1 || !completedLessons.has(lessons[activeLesson].id)}
                 onClick={() => setActiveLesson(prev => prev + 1)}
               >
                 Следующее <ArrowRight className="h-4 w-4 ml-1" />
