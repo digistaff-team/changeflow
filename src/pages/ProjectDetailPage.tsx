@@ -3,6 +3,7 @@ import { useAppStore } from '@/stores/app-store';
 import { mockTemplates, mockTemplateSteps, mockUsers } from '@/data/mock-data';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle2, Circle, Clock, Play } from 'lucide-react';
 
@@ -19,7 +20,7 @@ const stepStatusColors: Record<string, string> = {
 
 export default function ProjectDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { projects, projectSteps } = useAppStore();
+  const { projects, projectSteps, updateProjectStepStatus } = useAppStore();
 
   const project = projects.find(p => p.id === id);
   if (!project) return <div className="p-6 text-muted-foreground">Проект не найден</div>;
@@ -27,9 +28,9 @@ export default function ProjectDetailPage() {
   const template = mockTemplates.find(t => t.id === project.template_id);
   const steps = projectSteps.filter(s => s.project_id === project.id);
   const templateStepsForProject = mockTemplateSteps.filter(s => s.template_id === project.template_id);
-  const displaySteps = steps.length > 0 ? steps : templateStepsForProject.map((ts, i) => ({
+  const displaySteps = (steps.length > 0 ? steps : templateStepsForProject.map((ts, i) => ({
     id: `auto-${i}`, project_id: project.id, step_number: ts.step_number, name: ts.name, status: 'pending' as const,
-  }));
+  }))).sort((a, b) => a.step_number - b.step_number);
   const owner = mockUsers.find(u => u.id === project.owner_id);
 
   return (
@@ -91,6 +92,16 @@ export default function ProjectDetailPage() {
                       </p>
                     )}
                   </div>
+                  {step.status === 'pending' && (
+                    <Button size="sm" variant="outline" onClick={() => updateProjectStepStatus(project.id, step.id, 'in_progress')}>
+                      В работу
+                    </Button>
+                  )}
+                  {step.status === 'in_progress' && (
+                    <Button size="sm" onClick={() => updateProjectStepStatus(project.id, step.id, 'completed')}>
+                      Завершить
+                    </Button>
+                  )}
                   <Badge variant="secondary" className="text-xs capitalize">{step.status.replace('_', ' ')}</Badge>
                 </div>
               );

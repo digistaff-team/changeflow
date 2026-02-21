@@ -66,6 +66,7 @@ export interface ProjectStep {
 export type FeedbackType = 'suggestion' | 'concern' | 'question' | 'praise';
 export type FeedbackStatus = 'new' | 'reviewed' | 'in_progress' | 'resolved';
 export type Sentiment = 'positive' | 'neutral' | 'negative';
+export type FeedbackAnalysisStatus = 'pending' | 'completed' | 'analysis_failed';
 
 export interface Feedback {
   id: string;
@@ -76,11 +77,13 @@ export interface Feedback {
   message: string;
   status: FeedbackStatus;
   sentiment: Sentiment;
+  sentiment_score?: number;
   ai_tags: string[];
+  analysis_status: FeedbackAnalysisStatus;
   created_at: string;
 }
 
-export type ContentType = 'article' | 'video' | 'course' | 'guide' | 'checklist';
+export type ContentType = 'article' | 'video' | 'checklist' | 'instruction' | 'document';
 
 export interface LearningMaterial {
   id: string;
