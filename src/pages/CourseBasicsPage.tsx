@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
+import { mockLearningMaterials } from '@/data/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -13,12 +14,6 @@ import {
   ArrowLeft, ArrowRight, CheckCircle2, Play, Headphones,
   BarChart3, Trophy, Clock, Lock, BookOpen,
 } from 'lucide-react';
-
-const COURSE_TITLES: Record<string, string> = {
-  lm1: '\u041e\u0441\u043d\u043e\u0432\u044b \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044f \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f\u043c\u0438',
-  lm2: '\u0038 \u0448\u0430\u0433\u043e\u0432 \u041a\u043e\u0442\u0442\u0435\u0440\u0430 \u0434\u043b\u044f \u0442\u0440\u0430\u043d\u0441\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u0438',
-  lm3: '\u041f\u0440\u0435\u043e\u0434\u043e\u043b\u0435\u043d\u0438\u0435 \u0441\u043e\u043f\u0440\u043e\u0442\u0438\u0432\u043b\u0435\u043d\u0438\u044f \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f\u043c',
-};
 
 interface CourseMedia {
   id: string;
@@ -176,8 +171,10 @@ export default function CourseBasicsPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuthStore();
   const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
-  const courseId = id && COURSE_TITLES[id] ? id : 'lm1';
-  const courseTitle = COURSE_TITLES[courseId];
+  const courseMaterial = mockLearningMaterials.find((m) => m.id === id) ?? mockLearningMaterials[0];
+  const courseId = courseMaterial.id;
+  const courseTitle = courseMaterial.title;
+  const courseSummary = courseMaterial.content;
 
   const [activeLesson, setActiveLesson] = useState(0);
   const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
@@ -282,7 +279,7 @@ export default function CourseBasicsPage() {
           </Button>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-foreground">{courseTitle}</h1>
-            <p className="text-sm text-muted-foreground">Курс из 5 занятий + финальный квест</p>
+            <p className="text-sm text-muted-foreground">{courseSummary}</p>
           </div>
           <Badge variant="secondary" className="text-xs shrink-0">
             <Clock className="h-3 w-3 mr-1" /> ~{TOTAL_DURATION} мин
@@ -551,3 +548,4 @@ export default function CourseBasicsPage() {
     </div>
   );
 }
+
