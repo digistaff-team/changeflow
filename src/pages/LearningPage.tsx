@@ -1,5 +1,4 @@
-import { useMemo, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+﻿import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { mockLearningMaterials } from '@/data/mock-data';
@@ -7,14 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { BookOpen, Video, FileText, CheckSquare, GraduationCap, Clock, CheckCircle2, Lock } from 'lucide-react';
+import { BookOpen, Video, FileText, CheckSquare, GraduationCap, Clock, CheckCircle2 } from 'lucide-react';
 
 type CourseLesson = {
   id: string;
@@ -62,12 +54,6 @@ const typeIcons: Record<string, React.ElementType> = {
   checklist: CheckSquare,
   instruction: BookOpen,
   document: FileText,
-};
-
-const mediaTypeLabels: Record<CourseMedia['type'], string> = {
-  video: '\u0412\u0438\u0434\u0435\u043e',
-  audio: '\u0410\u0443\u0434\u0438\u043e-\u043f\u043e\u0434\u043a\u0430\u0441\u0442',
-  infographic: '\u0418\u043d\u0444\u043e\u0433\u0440\u0430\u0444\u0438\u043a\u0430',
 };
 
 const structuredCourses: Record<string, StructuredCourse> = {
@@ -221,107 +207,107 @@ const structuredCourses: Record<string, StructuredCourse> = {
   },
   lm2: {
     materialId: 'lm2',
-    title: '8 шагов Коттера для трансформации',
-    methodology: 'Практико-ориентированный формат: 5 последовательных занятий + итоговый квиз.',
+    title: '8 С€Р°РіРѕРІ РљРѕС‚С‚РµСЂР° РґР»СЏ С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё',
+    methodology: 'РџСЂР°РєС‚РёРєРѕ-РѕСЂРёРµРЅС‚РёСЂРѕРІР°РЅРЅС‹Р№ С„РѕСЂРјР°С‚: 5 РїРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅС‹С… Р·Р°РЅСЏС‚РёР№ + РёС‚РѕРіРѕРІС‹Р№ РєРІРёР·.',
     lessons: [
       {
         id: 'kotter-1',
-        title: 'Занятие 1. Срочность и коалиция изменений',
-        goal: 'Сформировать ощущение срочности и собрать команду проводников изменений.',
+        title: 'Р—Р°РЅСЏС‚РёРµ 1. РЎСЂРѕС‡РЅРѕСЃС‚СЊ Рё РєРѕР°Р»РёС†РёСЏ РёР·РјРµРЅРµРЅРёР№',
+        goal: 'РЎС„РѕСЂРјРёСЂРѕРІР°С‚СЊ РѕС‰СѓС‰РµРЅРёРµ СЃСЂРѕС‡РЅРѕСЃС‚Рё Рё СЃРѕР±СЂР°С‚СЊ РєРѕРјР°РЅРґСѓ РїСЂРѕРІРѕРґРЅРёРєРѕРІ РёР·РјРµРЅРµРЅРёР№.',
         content:
-          'Разберите причины трансформации, ключевые риски бездействия и роли лидеров изменений. Зафиксируйте состав коалиции и зоны ответственности.',
+          'Р Р°Р·Р±РµСЂРёС‚Рµ РїСЂРёС‡РёРЅС‹ С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё, РєР»СЋС‡РµРІС‹Рµ СЂРёСЃРєРё Р±РµР·РґРµР№СЃС‚РІРёСЏ Рё СЂРѕР»Рё Р»РёРґРµСЂРѕРІ РёР·РјРµРЅРµРЅРёР№. Р—Р°С„РёРєСЃРёСЂСѓР№С‚Рµ СЃРѕСЃС‚Р°РІ РєРѕР°Р»РёС†РёРё Рё Р·РѕРЅС‹ РѕС‚РІРµС‚СЃС‚РІРµРЅРЅРѕСЃС‚Рё.',
         durationMin: 35,
         checklist: [
-          'Сформулированы 3-5 причин срочности',
-          'Определены ключевые стейкхолдеры',
-          'Назначен владелец трансформации',
+          'РЎС„РѕСЂРјСѓР»РёСЂРѕРІР°РЅС‹ 3-5 РїСЂРёС‡РёРЅ СЃСЂРѕС‡РЅРѕСЃС‚Рё',
+          'РћРїСЂРµРґРµР»РµРЅС‹ РєР»СЋС‡РµРІС‹Рµ СЃС‚РµР№РєС…РѕР»РґРµСЂС‹',
+          'РќР°Р·РЅР°С‡РµРЅ РІР»Р°РґРµР»РµС† С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё',
         ],
       },
       {
         id: 'kotter-2',
-        title: 'Занятие 2. Видение и стратегия изменений',
-        goal: 'Собрать понятное видение целевого состояния и маршрут перехода.',
+        title: 'Р—Р°РЅСЏС‚РёРµ 2. Р’РёРґРµРЅРёРµ Рё СЃС‚СЂР°С‚РµРіРёСЏ РёР·РјРµРЅРµРЅРёР№',
+        goal: 'РЎРѕР±СЂР°С‚СЊ РїРѕРЅСЏС‚РЅРѕРµ РІРёРґРµРЅРёРµ С†РµР»РµРІРѕРіРѕ СЃРѕСЃС‚РѕСЏРЅРёСЏ Рё РјР°СЂС€СЂСѓС‚ РїРµСЂРµС…РѕРґР°.',
         content:
-          'Опишите целевую модель работы, критерии успеха и этапы внедрения. Убедитесь, что стратегия реализуема в сроках и ресурсах.',
+          'РћРїРёС€РёС‚Рµ С†РµР»РµРІСѓСЋ РјРѕРґРµР»СЊ СЂР°Р±РѕС‚С‹, РєСЂРёС‚РµСЂРёРё СѓСЃРїРµС…Р° Рё СЌС‚Р°РїС‹ РІРЅРµРґСЂРµРЅРёСЏ. РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ СЃС‚СЂР°С‚РµРіРёСЏ СЂРµР°Р»РёР·СѓРµРјР° РІ СЃСЂРѕРєР°С… Рё СЂРµСЃСѓСЂСЃР°С….',
         durationMin: 40,
         checklist: [
-          'Сформулировано единое видение',
-          'Определены KPI трансформации',
-          'Разложены этапы и контрольные точки',
+          'РЎС„РѕСЂРјСѓР»РёСЂРѕРІР°РЅРѕ РµРґРёРЅРѕРµ РІРёРґРµРЅРёРµ',
+          'РћРїСЂРµРґРµР»РµРЅС‹ KPI С‚СЂР°РЅСЃС„РѕСЂРјР°С†РёРё',
+          'Р Р°Р·Р»РѕР¶РµРЅС‹ СЌС‚Р°РїС‹ Рё РєРѕРЅС‚СЂРѕР»СЊРЅС‹Рµ С‚РѕС‡РєРё',
         ],
       },
       {
         id: 'kotter-3',
-        title: 'Занятие 3. Коммуникация и вовлечение',
-        goal: 'Снизить сопротивление через системную коммуникацию и участие команды.',
+        title: 'Р—Р°РЅСЏС‚РёРµ 3. РљРѕРјРјСѓРЅРёРєР°С†РёСЏ Рё РІРѕРІР»РµС‡РµРЅРёРµ',
+        goal: 'РЎРЅРёР·РёС‚СЊ СЃРѕРїСЂРѕС‚РёРІР»РµРЅРёРµ С‡РµСЂРµР· СЃРёСЃС‚РµРјРЅСѓСЋ РєРѕРјРјСѓРЅРёРєР°С†РёСЋ Рё СѓС‡Р°СЃС‚РёРµ РєРѕРјР°РЅРґС‹.',
         content:
-          'Подготовьте карту коммуникаций: кому, что, когда и в каком формате сообщаем. Определите каналы обратной связи и шаблоны ответов на возражения.',
+          'РџРѕРґРіРѕС‚РѕРІСЊС‚Рµ РєР°СЂС‚Сѓ РєРѕРјРјСѓРЅРёРєР°С†РёР№: РєРѕРјСѓ, С‡С‚Рѕ, РєРѕРіРґР° Рё РІ РєР°РєРѕРј С„РѕСЂРјР°С‚Рµ СЃРѕРѕР±С‰Р°РµРј. РћРїСЂРµРґРµР»РёС‚Рµ РєР°РЅР°Р»С‹ РѕР±СЂР°С‚РЅРѕР№ СЃРІСЏР·Рё Рё С€Р°Р±Р»РѕРЅС‹ РѕС‚РІРµС‚РѕРІ РЅР° РІРѕР·СЂР°Р¶РµРЅРёСЏ.',
         durationMin: 45,
         checklist: [
-          'Готов план коммуникаций',
-          'Определены частые возражения и ответы',
-          'Назначены ответственные за коммуникации',
+          'Р“РѕС‚РѕРІ РїР»Р°РЅ РєРѕРјРјСѓРЅРёРєР°С†РёР№',
+          'РћРїСЂРµРґРµР»РµРЅС‹ С‡Р°СЃС‚С‹Рµ РІРѕР·СЂР°Р¶РµРЅРёСЏ Рё РѕС‚РІРµС‚С‹',
+          'РќР°Р·РЅР°С‡РµРЅС‹ РѕС‚РІРµС‚СЃС‚РІРµРЅРЅС‹Рµ Р·Р° РєРѕРјРјСѓРЅРёРєР°С†РёРё',
         ],
       },
       {
         id: 'kotter-4',
-        title: 'Занятие 4. Быстрые победы и устранение барьеров',
-        goal: 'Показать первые результаты и снять организационные ограничения.',
+        title: 'Р—Р°РЅСЏС‚РёРµ 4. Р‘С‹СЃС‚СЂС‹Рµ РїРѕР±РµРґС‹ Рё СѓСЃС‚СЂР°РЅРµРЅРёРµ Р±Р°СЂСЊРµСЂРѕРІ',
+        goal: 'РџРѕРєР°Р·Р°С‚СЊ РїРµСЂРІС‹Рµ СЂРµР·СѓР»СЊС‚Р°С‚С‹ Рё СЃРЅСЏС‚СЊ РѕСЂРіР°РЅРёР·Р°С†РёРѕРЅРЅС‹Рµ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ.',
         content:
-          'Выберите короткие инициативы с измеримым эффектом, зафиксируйте барьеры и план их устранения. Договоритесь о публичной фиксации быстрых побед.',
+          'Р’С‹Р±РµСЂРёС‚Рµ РєРѕСЂРѕС‚РєРёРµ РёРЅРёС†РёР°С‚РёРІС‹ СЃ РёР·РјРµСЂРёРјС‹Рј СЌС„С„РµРєС‚РѕРј, Р·Р°С„РёРєСЃРёСЂСѓР№С‚Рµ Р±Р°СЂСЊРµСЂС‹ Рё РїР»Р°РЅ РёС… СѓСЃС‚СЂР°РЅРµРЅРёСЏ. Р”РѕРіРѕРІРѕСЂРёС‚РµСЃСЊ Рѕ РїСѓР±Р»РёС‡РЅРѕР№ С„РёРєСЃР°С†РёРё Р±С‹СЃС‚СЂС‹С… РїРѕР±РµРґ.',
         durationMin: 40,
         checklist: [
-          'Определены 2-3 быстрые победы',
-          'Составлен реестр барьеров',
-          'Утверждены действия по снятию барьеров',
+          'РћРїСЂРµРґРµР»РµРЅС‹ 2-3 Р±С‹СЃС‚СЂС‹Рµ РїРѕР±РµРґС‹',
+          'РЎРѕСЃС‚Р°РІР»РµРЅ СЂРµРµСЃС‚СЂ Р±Р°СЂСЊРµСЂРѕРІ',
+          'РЈС‚РІРµСЂР¶РґРµРЅС‹ РґРµР№СЃС‚РІРёСЏ РїРѕ СЃРЅСЏС‚РёСЋ Р±Р°СЂСЊРµСЂРѕРІ',
         ],
       },
       {
         id: 'kotter-5',
-        title: 'Занятие 5. Масштабирование и закрепление в культуре',
-        goal: 'Перевести изменения в стандарт работы и корпоративные практики.',
+        title: 'Р—Р°РЅСЏС‚РёРµ 5. РњР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёРµ Рё Р·Р°РєСЂРµРїР»РµРЅРёРµ РІ РєСѓР»СЊС‚СѓСЂРµ',
+        goal: 'РџРµСЂРµРІРµСЃС‚Рё РёР·РјРµРЅРµРЅРёСЏ РІ СЃС‚Р°РЅРґР°СЂС‚ СЂР°Р±РѕС‚С‹ Рё РєРѕСЂРїРѕСЂР°С‚РёРІРЅС‹Рµ РїСЂР°РєС‚РёРєРё.',
         content:
-          'Сформируйте план масштабирования, обновите регламенты и привяжите новые практики к системе оценки эффективности и обучению новых сотрудников.',
+          'РЎС„РѕСЂРјРёСЂСѓР№С‚Рµ РїР»Р°РЅ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ, РѕР±РЅРѕРІРёС‚Рµ СЂРµРіР»Р°РјРµРЅС‚С‹ Рё РїСЂРёРІСЏР¶РёС‚Рµ РЅРѕРІС‹Рµ РїСЂР°РєС‚РёРєРё Рє СЃРёСЃС‚РµРјРµ РѕС†РµРЅРєРё СЌС„С„РµРєС‚РёРІРЅРѕСЃС‚Рё Рё РѕР±СѓС‡РµРЅРёСЋ РЅРѕРІС‹С… СЃРѕС‚СЂСѓРґРЅРёРєРѕРІ.',
         durationMin: 45,
         checklist: [
-          'Согласован план масштабирования',
-          'Обновлены регламенты и роли',
-          'Встроен контроль устойчивости изменений',
+          'РЎРѕРіР»Р°СЃРѕРІР°РЅ РїР»Р°РЅ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ',
+          'РћР±РЅРѕРІР»РµРЅС‹ СЂРµРіР»Р°РјРµРЅС‚С‹ Рё СЂРѕР»Рё',
+          'Р’СЃС‚СЂРѕРµРЅ РєРѕРЅС‚СЂРѕР»СЊ СѓСЃС‚РѕР№С‡РёРІРѕСЃС‚Рё РёР·РјРµРЅРµРЅРёР№',
         ],
       },
     ],
     quiz: {
-      title: 'Итоговый квиз по 8 шагам Коттера',
+      title: 'РС‚РѕРіРѕРІС‹Р№ РєРІРёР· РїРѕ 8 С€Р°РіР°Рј РљРѕС‚С‚РµСЂР°',
       passScore: 80,
       questions: [
         {
           id: 'q1',
-          question: 'С чего начинается модель Коттера?',
-          options: ['С формирования видения', 'С создания ощущения срочности', 'С масштабирования изменений'],
+          question: 'РЎ С‡РµРіРѕ РЅР°С‡РёРЅР°РµС‚СЃСЏ РјРѕРґРµР»СЊ РљРѕС‚С‚РµСЂР°?',
+          options: ['РЎ С„РѕСЂРјРёСЂРѕРІР°РЅРёСЏ РІРёРґРµРЅРёСЏ', 'РЎ СЃРѕР·РґР°РЅРёСЏ РѕС‰СѓС‰РµРЅРёСЏ СЃСЂРѕС‡РЅРѕСЃС‚Рё', 'РЎ РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРёСЏ РёР·РјРµРЅРµРЅРёР№'],
           correctIndex: 1,
         },
         {
           id: 'q2',
-          question: 'Зачем нужны «быстрые победы»?',
-          options: ['Чтобы сократить бюджет', 'Чтобы повысить доверие к изменениям', 'Чтобы отменить коммуникации'],
+          question: 'Р—Р°С‡РµРј РЅСѓР¶РЅС‹ В«Р±С‹СЃС‚СЂС‹Рµ РїРѕР±РµРґС‹В»?',
+          options: ['Р§С‚РѕР±С‹ СЃРѕРєСЂР°С‚РёС‚СЊ Р±СЋРґР¶РµС‚', 'Р§С‚РѕР±С‹ РїРѕРІС‹СЃРёС‚СЊ РґРѕРІРµСЂРёРµ Рє РёР·РјРµРЅРµРЅРёСЏРј', 'Р§С‚РѕР±С‹ РѕС‚РјРµРЅРёС‚СЊ РєРѕРјРјСѓРЅРёРєР°С†РёРё'],
           correctIndex: 1,
         },
         {
           id: 'q3',
-          question: 'Когда изменения считаются закрепленными?',
-          options: ['Когда есть один успешный пилот', 'Когда практики встроены в культуру и стандарты', 'Когда проект закрыт формально'],
+          question: 'РљРѕРіРґР° РёР·РјРµРЅРµРЅРёСЏ СЃС‡РёС‚Р°СЋС‚СЃСЏ Р·Р°РєСЂРµРїР»РµРЅРЅС‹РјРё?',
+          options: ['РљРѕРіРґР° РµСЃС‚СЊ РѕРґРёРЅ СѓСЃРїРµС€РЅС‹Р№ РїРёР»РѕС‚', 'РљРѕРіРґР° РїСЂР°РєС‚РёРєРё РІСЃС‚СЂРѕРµРЅС‹ РІ РєСѓР»СЊС‚СѓСЂСѓ Рё СЃС‚Р°РЅРґР°СЂС‚С‹', 'РљРѕРіРґР° РїСЂРѕРµРєС‚ Р·Р°РєСЂС‹С‚ С„РѕСЂРјР°Р»СЊРЅРѕ'],
           correctIndex: 1,
         },
         {
           id: 'q4',
-          question: 'Кто отвечает за устойчивость изменений?',
-          options: ['Только HR', 'Только руководитель проекта', 'Коалиция лидеров и линейные руководители'],
+          question: 'РљС‚Рѕ РѕС‚РІРµС‡Р°РµС‚ Р·Р° СѓСЃС‚РѕР№С‡РёРІРѕСЃС‚СЊ РёР·РјРµРЅРµРЅРёР№?',
+          options: ['РўРѕР»СЊРєРѕ HR', 'РўРѕР»СЊРєРѕ СЂСѓРєРѕРІРѕРґРёС‚РµР»СЊ РїСЂРѕРµРєС‚Р°', 'РљРѕР°Р»РёС†РёСЏ Р»РёРґРµСЂРѕРІ Рё Р»РёРЅРµР№РЅС‹Рµ СЂСѓРєРѕРІРѕРґРёС‚РµР»Рё'],
           correctIndex: 2,
         },
         {
           id: 'q5',
-          question: 'Что критично для шага коммуникации?',
-          options: ['Единые сообщения и регулярная обратная связь', 'Разовая рассылка', 'Коммуникации только для топ-менеджмента'],
+          question: 'Р§С‚Рѕ РєСЂРёС‚РёС‡РЅРѕ РґР»СЏ С€Р°РіР° РєРѕРјРјСѓРЅРёРєР°С†РёРё?',
+          options: ['Р•РґРёРЅС‹Рµ СЃРѕРѕР±С‰РµРЅРёСЏ Рё СЂРµРіСѓР»СЏСЂРЅР°СЏ РѕР±СЂР°С‚РЅР°СЏ СЃРІСЏР·СЊ', 'Р Р°Р·РѕРІР°СЏ СЂР°СЃСЃС‹Р»РєР°', 'РљРѕРјРјСѓРЅРёРєР°С†РёРё С‚РѕР»СЊРєРѕ РґР»СЏ С‚РѕРї-РјРµРЅРµРґР¶РјРµРЅС‚Р°'],
           correctIndex: 0,
         },
       ],
@@ -334,21 +320,7 @@ export default function LearningPage() {
   const { user } = useAuthStore();
   const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
 
-  const [activeCourseId, setActiveCourseId] = useState<string | null>(null);
-  const [completedLessonsByCourse, setCompletedLessonsByCourse] = useState<Record<string, number[]>>({});
-  const [activeLessonIndex, setActiveLessonIndex] = useState(0);
-  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>({});
-  const [quizScore, setQuizScore] = useState<number | null>(null);
-
   const userId = user?.id || 'u1';
-
-  const buildCompletedLessonsFromPercent = (materialId: string, progressPercent?: number) => {
-    const course = structuredCourses[materialId];
-    if (!course) return [];
-    const boundedPercent = Math.max(0, Math.min(100, progressPercent ?? 0));
-    const completedCount = Math.floor((boundedPercent / 100) * course.lessons.length);
-    return Array.from({ length: completedCount }, (_, index) => index);
-  };
 
   const getUserProgress = (materialId: string) => {
     return learningProgress.find((lp) => lp.user_id === userId && lp.material_id === materialId);
@@ -391,91 +363,6 @@ export default function LearningPage() {
     upsertLearningProgress(materialId, 100, true);
   };
 
-  const openStructuredCourse = (materialId: string) => {
-    const course = structuredCourses[materialId];
-    if (!course) return;
-
-    const existing = getUserProgress(materialId);
-    const completedLessons =
-      completedLessonsByCourse[materialId] ?? buildCompletedLessonsFromPercent(materialId, existing?.progress_percent);
-    const nextLessonIndex = course.lessons.findIndex((_, index) => !completedLessons.includes(index));
-
-    setCompletedLessonsByCourse((prev) => {
-      if (prev[materialId]) return prev;
-      return {
-        ...prev,
-        [materialId]: completedLessons,
-      };
-    });
-    setActiveCourseId(materialId);
-    setActiveLessonIndex(nextLessonIndex === -1 ? course.lessons.length - 1 : nextLessonIndex);
-    setQuizAnswers({});
-    setQuizScore(null);
-  };
-
-  const closeStructuredCourse = () => {
-    setActiveCourseId(null);
-    setQuizAnswers({});
-    setQuizScore(null);
-  };
-
-  const activeCourse = activeCourseId ? structuredCourses[activeCourseId] : null;
-  const completedLessons = useMemo(
-    () => (activeCourseId ? completedLessonsByCourse[activeCourseId] ?? [] : []),
-    [activeCourseId, completedLessonsByCourse],
-  );
-  const completedLessonSet = useMemo(() => new Set(completedLessons), [completedLessons]);
-  const allLessonsCompleted = !!activeCourse && completedLessons.length === activeCourse.lessons.length;
-
-  const isLessonUnlocked = (lessonIndex: number) => {
-    if (lessonIndex === 0) return true;
-    return completedLessonSet.has(lessonIndex - 1);
-  };
-
-  const completeLesson = (lessonIndex: number) => {
-    if (!activeCourseId || !activeCourse || !isLessonUnlocked(lessonIndex)) return;
-
-    setCompletedLessonsByCourse((prev) => {
-      const currentLessons = prev[activeCourseId] ?? [];
-      if (currentLessons.includes(lessonIndex)) return prev;
-
-      const nextLessons = [...currentLessons, lessonIndex].sort((a, b) => a - b);
-      const progressPercent = Math.round((nextLessons.length / activeCourse.lessons.length) * 100);
-      upsertLearningProgress(activeCourseId, progressPercent);
-
-      return {
-        ...prev,
-        [activeCourseId]: nextLessons,
-      };
-    });
-
-    if (activeCourse.lessons[lessonIndex + 1]) {
-      setActiveLessonIndex(lessonIndex + 1);
-    }
-  };
-
-  const submitQuiz = () => {
-    if (!activeCourseId || !activeCourse) return;
-
-    const totalQuestions = activeCourse.quiz.questions.length;
-    if (Object.keys(quizAnswers).length < totalQuestions) return;
-
-    const correctAnswers = activeCourse.quiz.questions.reduce((sum, question) => {
-      return sum + (quizAnswers[question.id] === question.correctIndex ? 1 : 0);
-    }, 0);
-
-    const score = Math.round((correctAnswers / totalQuestions) * 100);
-    setQuizScore(score);
-
-    if (score >= activeCourse.quiz.passScore) {
-      upsertLearningProgress(activeCourseId, 100, true);
-      return;
-    }
-
-    const currentLessonProgress = Math.round((completedLessons.length / activeCourse.lessons.length) * 100);
-    upsertLearningProgress(activeCourseId, currentLessonProgress);
-  };
-
   const completedCount = learningProgress.filter((lp) => lp.user_id === userId && lp.completed_at).length;
   const totalCount = mockLearningMaterials.filter((m) => m.target_roles.includes(user?.role || 'employee')).length;
 
@@ -483,15 +370,15 @@ export default function LearningPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Обучение</h1>
-          <p className="text-muted-foreground">Образовательные материалы по управлению изменениями</p>
+          <h1 className="text-2xl font-bold text-foreground">РћР±СѓС‡РµРЅРёРµ</h1>
+          <p className="text-muted-foreground">РћР±СЂР°Р·РѕРІР°С‚РµР»СЊРЅС‹Рµ РјР°С‚РµСЂРёР°Р»С‹ РїРѕ СѓРїСЂР°РІР»РµРЅРёСЋ РёР·РјРµРЅРµРЅРёСЏРјРё</p>
         </div>
         <Card className="px-4 py-2">
           <div className="flex items-center gap-3">
             <GraduationCap className="h-5 w-5 text-primary" />
             <div>
               <p className="text-lg font-bold">{completedCount}/{totalCount}</p>
-              <p className="text-xs text-muted-foreground">Пройдено</p>
+              <p className="text-xs text-muted-foreground">РџСЂРѕР№РґРµРЅРѕ</p>
             </div>
           </div>
         </Card>
@@ -503,11 +390,7 @@ export default function LearningPage() {
           const progress = getUserProgress(material.id);
           const isCompleted = !!progress?.completed_at;
           const hasStructuredCourse = !!structuredCourses[material.id];
-          const completedLessonIndexes = completedLessonsByCourse[material.id];
-          const lessonBasedProgress = hasStructuredCourse && completedLessonIndexes
-            ? Math.round((completedLessonIndexes.length / structuredCourses[material.id].lessons.length) * 100)
-            : undefined;
-          const displayProgressPercent = lessonBasedProgress ?? progress?.progress_percent;
+          const displayProgressPercent = progress?.progress_percent;
 
           return (
             <Card key={material.id} className="flex flex-col">
@@ -529,7 +412,7 @@ export default function LearningPage() {
               <CardContent className="mt-auto space-y-3">
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <Clock className="h-3 w-3" />
-                  <span>{material.duration_min} мин.</span>
+                  <span>{material.duration_min} РјРёРЅ.</span>
                 </div>
                 {displayProgressPercent !== undefined && (
                   <div className="space-y-1">
@@ -543,13 +426,8 @@ export default function LearningPage() {
                   variant="outline"
                   className="w-full"
                   onClick={() => {
-                    if (material.id === 'lm1' || material.id === 'lm3') {
+                    if (hasStructuredCourse || material.id === 'lm3') {
                       navigate(`/learning/course/${material.id}`);
-                      return;
-                    }
-
-                    if (hasStructuredCourse) {
-                      openStructuredCourse(material.id);
                       return;
                     }
 
@@ -570,182 +448,9 @@ export default function LearningPage() {
           );
         })}
       </div>
-
-      <Dialog open={!!activeCourse} onOpenChange={(open) => (!open ? closeStructuredCourse() : undefined)}>
-        <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto">
-          {activeCourse && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{activeCourse.title}</DialogTitle>
-                <DialogDescription>{activeCourse.methodology}</DialogDescription>
-              </DialogHeader>
-
-              <div className="space-y-4">
-                <div>
-                  <p className="text-sm font-medium mb-2">Прогресс курса</p>
-                  <Progress
-                    value={Math.round((completedLessons.length / activeCourse.lessons.length) * 100)}
-                    className="h-2"
-                  />
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  {activeCourse.lessons.map((lesson, index) => {
-                    const isCompletedLesson = completedLessonSet.has(index);
-                    const isUnlocked = isLessonUnlocked(index);
-
-                    return (
-                      <Card
-                        key={lesson.id}
-                        className={activeLessonIndex === index ? 'border-primary' : ''}
-                      >
-                        <CardHeader className="pb-2">
-                          <div className="flex items-start justify-between gap-2">
-                            <CardTitle className="text-sm">{lesson.title}</CardTitle>
-                            {!isUnlocked && <Lock className="h-4 w-4 text-muted-foreground" />}
-                          </div>
-                          <CardDescription className="text-xs">{lesson.goal}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-2">
-                          <p className="text-xs text-muted-foreground">{lesson.durationMin} мин.</p>
-                          {isCompletedLesson && (
-                            <Badge className="bg-green-100 text-green-800">{'\u0417\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u043e'}</Badge>
-                          )}
-                            <Button
-                              size="sm"
-                              variant={isUnlocked ? 'outline' : 'secondary'}
-                              disabled={!isUnlocked}
-                              onClick={() => setActiveLessonIndex(index)}
-                            >
-                              {isUnlocked
-                                ? '\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0437\u0430\u043d\u044f\u0442\u0438\u0435'
-                                : '\u0417\u0430\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u043e'}
-                            </Button>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
-                </div>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">{activeCourse.lessons[activeLessonIndex].title}</CardTitle>
-                    <CardDescription>{activeCourse.lessons[activeLessonIndex].goal}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <p className="text-sm">{activeCourse.lessons[activeLessonIndex].content}</p>
-                    {activeCourse.lessons[activeLessonIndex].longread && (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium mb-1">Лонгрид:</p>
-                        {activeCourse.lessons[activeLessonIndex].longread?.map((paragraph) => (
-                          <p key={paragraph} className="text-sm text-muted-foreground leading-relaxed">{paragraph}</p>
-                        ))}
-                      </div>
-                    )}
-
-                    {activeCourse.lessons[activeLessonIndex].media && (
-                      <div className="space-y-2">
-                        <p className="text-sm font-medium mb-1">Мультимедиа:</p>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                          {activeCourse.lessons[activeLessonIndex].media?.map((media) => (
-                            <Card key={media.id} className="border-dashed">
-                              <CardHeader className="pb-2">
-                                <CardTitle className="text-sm">{media.title}</CardTitle>
-                                <CardDescription className="text-xs">{media.description}</CardDescription>
-                              </CardHeader>
-                              <CardContent className="pt-0 space-y-2">
-                                <Badge variant="outline" className="text-xs">{mediaTypeLabels[media.type]}</Badge>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="w-full"
-                                  onClick={() => window.open(media.url, '_blank', 'noopener,noreferrer')}
-                                >
-                                  {'\u041e\u0442\u043a\u0440\u044b\u0442\u044c \u0440\u0435\u0441\u0443\u0440\u0441'}
-                                </Button>
-                              </CardContent>
-                            </Card>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    <div>
-                      <p className="text-sm font-medium mb-2">Практические шаги:</p>
-                      <ul className="text-sm list-disc pl-5 space-y-1">
-                        {activeCourse.lessons[activeLessonIndex].checklist.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    {!completedLessonSet.has(activeLessonIndex) && (
-                      <Button onClick={() => completeLesson(activeLessonIndex)}>
-                        {'\u0417\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u044c \u0437\u0430\u043d\u044f\u0442\u0438\u0435'}
-                      </Button>
-                    )}
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">{activeCourse.quiz.title}</CardTitle>
-                    <CardDescription>
-                      Квиз станет доступен после завершения всех 5 занятий. Проходной балл: {activeCourse.quiz.passScore}%.
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    {!allLessonsCompleted && (
-                      <Badge variant="secondary">
-                        {'\u0421\u043d\u0430\u0447\u0430\u043b\u0430 \u0437\u0430\u0432\u0435\u0440\u0448\u0438\u0442\u0435 \u0432\u0441\u0435 \u0437\u0430\u043d\u044f\u0442\u0438\u044f \u043f\u043e \u043f\u043e\u0440\u044f\u0434\u043a\u0443'}
-                      </Badge>
-                    )}
-
-                    {allLessonsCompleted && (
-                      <div className="space-y-4">
-                        {activeCourse.quiz.questions.map((question, index) => (
-                          <div key={question.id} className="space-y-2">
-                            <p className="text-sm font-medium">{index + 1}. {question.question}</p>
-                            <div className="flex flex-col gap-2">
-                              {question.options.map((option, optionIndex) => (
-                                <Button
-                                  key={option}
-                                  type="button"
-                                  variant={quizAnswers[question.id] === optionIndex ? 'default' : 'outline'}
-                                  className="justify-start h-auto whitespace-normal"
-                                  onClick={() => setQuizAnswers((prev) => ({ ...prev, [question.id]: optionIndex }))}
-                                >
-                                  {option}
-                                </Button>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-
-                        <Button onClick={submitQuiz}>{'\u041f\u0440\u043e\u0432\u0435\u0440\u0438\u0442\u044c \u043a\u0432\u0438\u0437'}</Button>
-
-                        {quizScore !== null && (
-                          quizScore >= activeCourse.quiz.passScore ? (
-                            <Badge className="bg-green-100 text-green-800">
-                              {'\u041a\u0432\u0438\u0437 \u043f\u0440\u043e\u0439\u0434\u0435\u043d'}: {quizScore}%.
-                              {' \u041a\u0443\u0440\u0441 \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d.'}
-                            </Badge>
-                          ) : (
-                            <Badge variant="destructive">
-                              {'\u041a\u0432\u0438\u0437 \u043d\u0435 \u043f\u0440\u043e\u0439\u0434\u0435\u043d'}: {quizScore}%.
-                              {' \u041f\u043e\u0432\u0442\u043e\u0440\u0438\u0442\u0435 \u0438 \u043f\u043e\u043f\u0440\u043e\u0431\u0443\u0439\u0442\u0435 \u0441\u043d\u043e\u0432\u0430.'}
-                            </Badge>
-                          )
-                        )}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
+
+
 

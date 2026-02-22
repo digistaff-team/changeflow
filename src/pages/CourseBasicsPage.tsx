@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,7 +14,11 @@ import {
   BarChart3, Trophy, Clock, Lock, BookOpen,
 } from 'lucide-react';
 
-const COURSE_ID = 'lm1';
+const COURSE_TITLES: Record<string, string> = {
+  lm1: '\u041e\u0441\u043d\u043e\u0432\u044b \u0443\u043f\u0440\u0430\u0432\u043b\u0435\u043d\u0438\u044f \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f\u043c\u0438',
+  lm2: '\u0038 \u0448\u0430\u0433\u043e\u0432 \u041a\u043e\u0442\u0442\u0435\u0440\u0430 \u0434\u043b\u044f \u0442\u0440\u0430\u043d\u0441\u0444\u043e\u0440\u043c\u0430\u0446\u0438\u0438',
+  lm3: '\u041f\u0440\u0435\u043e\u0434\u043e\u043b\u0435\u043d\u0438\u0435 \u0441\u043e\u043f\u0440\u043e\u0442\u0438\u0432\u043b\u0435\u043d\u0438\u044f \u0438\u0437\u043c\u0435\u043d\u0435\u043d\u0438\u044f\u043c',
+};
 
 interface CourseMedia {
   id: string;
@@ -169,8 +173,11 @@ const TOTAL_DURATION = lessons.reduce((s, l) => s + l.durationMin, 0);
 
 export default function CourseBasicsPage() {
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
   const { user } = useAuthStore();
   const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
+  const courseId = id && COURSE_TITLES[id] ? id : 'lm1';
+  const courseTitle = COURSE_TITLES[courseId];
 
   const [activeLesson, setActiveLesson] = useState(0);
   const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
@@ -180,7 +187,7 @@ export default function CourseBasicsPage() {
   const [questSubmitted, setQuestSubmitted] = useState(false);
 
   const userId = user?.id || 'u1';
-  const progressRecord = learningProgress.find(lp => lp.user_id === userId && lp.material_id === COURSE_ID);
+  const progressRecord = learningProgress.find(lp => lp.user_id === userId && lp.material_id === courseId);
   const overallPercent = Math.round(((completedLessons.size + (questSubmitted ? 1 : 0)) / (lessons.length + 1)) * 100);
 
   const isLessonUnlocked = (index: number) => index === 0 || completedLessons.has(index - 1);
@@ -191,7 +198,7 @@ export default function CourseBasicsPage() {
     if (progressRecord) {
       updateLearningProgress(progressRecord.id, { progress_percent: pct });
     } else {
-      addLearningProgress({ id: 'ulp' + Date.now(), user_id: userId, material_id: COURSE_ID, progress_percent: pct });
+      addLearningProgress({ id: 'ulp' + Date.now(), user_id: userId, material_id: courseId, progress_percent: pct });
     }
   };
 
@@ -209,7 +216,7 @@ export default function CourseBasicsPage() {
     if (progressRecord) {
       updateLearningProgress(progressRecord.id, { progress_percent: 100, completed_at: new Date().toISOString() });
     } else {
-      addLearningProgress({ id: 'ulp' + Date.now(), user_id: userId, material_id: COURSE_ID, progress_percent: 100, completed_at: new Date().toISOString() });
+      addLearningProgress({ id: 'ulp' + Date.now(), user_id: userId, material_id: courseId, progress_percent: 100, completed_at: new Date().toISOString() });
     }
   };
 
@@ -274,7 +281,7 @@ export default function CourseBasicsPage() {
             <ArrowLeft className="h-5 w-5" />
           </Button>
           <div className="flex-1">
-            <h1 className="text-xl font-bold text-foreground">Основы управления изменениями</h1>
+            <h1 className="text-xl font-bold text-foreground">{courseTitle}</h1>
             <p className="text-sm text-muted-foreground">Курс из 5 занятий + финальный квест</p>
           </div>
           <Badge variant="secondary" className="text-xs shrink-0">
