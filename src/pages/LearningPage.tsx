@@ -1,4 +1,5 @@
-﻿import { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { mockLearningMaterials } from '@/data/mock-data';
@@ -329,6 +330,7 @@ const structuredCourses: Record<string, StructuredCourse> = {
 };
 
 export default function LearningPage() {
+  const navigate = useNavigate();
   const { user } = useAuthStore();
   const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
 
@@ -541,6 +543,11 @@ export default function LearningPage() {
                   variant="outline"
                   className="w-full"
                   onClick={() => {
+                    if (material.id === 'lm1' || material.id === 'lm3') {
+                      navigate(`/learning/course/${material.id}`);
+                      return;
+                    }
+
                     if (hasStructuredCourse) {
                       openStructuredCourse(material.id);
                       return;
