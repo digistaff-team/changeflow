@@ -104,6 +104,14 @@ export interface UserLearningProgress {
   progress_percent: number;
 }
 
+export interface LessonProgress {
+  id: string;
+  user_id: string;
+  material_id: string;
+  lesson_id: string;
+  completed_at: string;
+}
+
 export interface AiConversation {
   id: string;
   user_id: string;

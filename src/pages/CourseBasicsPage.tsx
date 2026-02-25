@@ -1,8 +1,9 @@
-﻿import { useState, useMemo } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { mockLearningMaterials } from '@/data/mock-data';
+import type { LearningMaterial } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -43,160 +44,281 @@ interface QuizQuestion {
   explanation: string;
 }
 
-const lessons: CourseLesson[] = [
-  {
-    id: 'base-1',
-    title: 'Занятие 1. Природа изменений и роль лидера',
-    shortTitle: 'Природа изменений',
-    goal: 'Понять, почему изменения проваливаются и как управлять ими системно.',
-    content: 'В фокусе занятия: модель люди-процесс-технологии, типичные ошибки и базовые принципы работы лидера изменений.',
-    durationMin: 40,
-    checklist: [
-      'Выделены главные причины провалов изменений',
-      'Сформулирована роль спонсора и лидера проекта',
-      'Описаны целевые поведенческие практики',
-    ],
-    longread: [
-      'Управление изменениями не сводится к приказу «делаем по-новому». Это управление переходом: от текущей модели работы к целевой, с четкими этапами и обратной связью. Без системного подхода даже самые разумные инициативы рискуют столкнуться с сопротивлением и потерей мотивации команды.',
-      'Ключевая задача лидера — не только объявить изменение, но и обеспечить понятность, ресурсы и последовательность действий. Лидер изменений выступает как архитектор перехода: он формирует видение, выстраивает коммуникацию и создает условия для первых побед.',
-    ],
-    media: [
-      { id: 'm1v', type: 'video', title: 'Видео: Почему изменения проваливаются', description: 'Краткий разбор 5 типовых ошибок.', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-      { id: 'm1a', type: 'audio', title: 'Подкаст: Роль лидера изменений', description: 'Практические кейсы внедрения.', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
-      { id: 'm1i', type: 'infographic', title: 'Инфографика: Цикл изменений', description: 'От инициации до закрепления.', url: '' },
-    ],
-  },
-  {
-    id: 'base-2',
-    title: 'Занятие 2. Диагностика текущего состояния',
-    shortTitle: 'Диагностика',
-    goal: 'Оценить готовность к изменениям и выявить барьеры.',
-    content: 'Занятие посвящено карте стейкхолдеров, анализу процессов и измерению исходных KPI.',
-    durationMin: 45,
-    checklist: [
-      'Обновлена карта стейкхолдеров',
-      'Выявлены риски и барьеры',
-      'Зафиксированы базовые KPI',
-    ],
-    longread: [
-      'Диагностика — база для реалистичной дорожной карты. Без нее команда часто пропускает системные причины сопротивления. Качественная диагностика включает анализ процессов, ролей, культуры и технологической готовности организации.',
-      'Важно объединять качественные (интервью, наблюдение) и количественные (метрики, сроки, дефекты) данные. Только их сочетание дает объемную картину, позволяющую принимать обоснованные решения о стратегии изменений.',
-    ],
-    media: [
-      { id: 'm2v', type: 'video', title: 'Видео: Как проводить диагностику', description: 'Чек-лист перед запуском изменений.', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-      { id: 'm2a', type: 'audio', title: 'Подкаст: Где искать сопротивление', description: 'Сигналы риска до старта внедрения.', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
-      { id: 'm2i', type: 'infographic', title: 'Инфографика: Матрица рисков', description: 'Влияние и вероятность для каждого риска.', url: '' },
-    ],
-  },
-  {
-    id: 'base-3',
-    title: 'Занятие 3. Коммуникация и вовлечение',
-    shortTitle: 'Коммуникация',
-    goal: 'Построить план коммуникаций и запустить обратную связь.',
-    content: 'В лонгриде разбираются каналы коммуникации, форматы сообщений и работа с вопросами сотрудников.',
-    durationMin: 45,
-    checklist: [
-      'Собран единый план коммуникаций',
-      'Определены ответственные за каналы',
-      'Настроен цикл обратной связи',
-    ],
-    longread: [
-      'Хорошая коммуникация по изменениям — это ритм и прозрачность: что делаем, зачем и как измеряем результат. Системная коммуникация снижает тревожность и создает ощущение контроля у сотрудников.',
-      'Критично давать не только информацию, но и способ влиять на ход изменений через вопросы и предложения. Каналы обратной связи должны быть доступны и безопасны — только тогда команда будет делиться реальными опасениями.',
-    ],
-    media: [
-      { id: 'm3v', type: 'video', title: 'Видео: Шаблон объявления изменений', description: 'Как говорить о нововведениях понятно.', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-      { id: 'm3a', type: 'audio', title: 'Подкаст: Сложные вопросы команды', description: 'Примеры ответов без потери доверия.', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
-      { id: 'm3i', type: 'infographic', title: 'Инфографика: Карта коммуникаций', description: 'Кому, что, когда и в каком канале.', url: '' },
-    ],
-  },
-  {
-    id: 'base-4',
-    title: 'Занятие 4. Быстрые победы и устойчивость',
-    shortTitle: 'Быстрые победы',
-    goal: 'Запустить пилоты и зафиксировать быстрый эффект.',
-    content: 'Здесь обсуждаются критерии быстрой победы, пилотные инициативы и метрики успеха на первые 30 дней.',
-    durationMin: 40,
-    checklist: [
-      'Выбраны быстрые пилоты',
-      'Назначены владельцы результата',
-      'Зафиксирован план масштабирования',
-    ],
-    longread: [
-      'Быстрая победа — это не показуха, а доказательство работоспособности нового подхода на реальном процессе. Она должна быть видимой, измеримой и значимой для команды.',
-      'Для устойчивости нужны регламент, владелец и ритм контроля — иначе система откатится к прежним привычкам. Масштабирование начинается только после подтверждения результатов на пилоте.',
-    ],
-    media: [
-      { id: 'm4v', type: 'video', title: 'Видео: Запуск пилота за 2 недели', description: 'Шаги и точки контроля.', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-      { id: 'm4a', type: 'audio', title: 'Подкаст: Как закрепить новую практику', description: 'Разбор ошибок масштабирования.', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
-      { id: 'm4i', type: 'infographic', title: 'Инфографика: Воронка быстрых побед', description: 'От пилота к масштабу.', url: '' },
-    ],
-  },
-  {
-    id: 'base-5',
-    title: 'Занятие 5. Интеграция изменений в культуру',
-    shortTitle: 'Интеграция в культуру',
-    goal: 'Встроить новые практики в ежедневное управление.',
-    content: 'Финальный лонгрид о закреплении изменений: стандарты, роли, обучение новых сотрудников, петля улучшений.',
-    durationMin: 50,
-    checklist: [
-      'Обновлены стандарты и регламенты',
-      'Определен владелец поддержки изменений',
-      'Запущен цикл пересмотра результатов',
-    ],
-    longread: [
-      'Изменение становится «нормой», когда оно встроено в регулярные процессы управления: планерки, KPI, обучение, аудиты. Без этого шага любые достижения остаются временными.',
-      'На этом этапе важно перейти от «проекта изменений» к «системе улучшений», где каждая команда знает, как поддерживать новый стандарт и развивать его дальше.',
-    ],
-    media: [
-      { id: 'm5v', type: 'video', title: 'Видео: Закрепление изменений', description: 'Как не допустить откат к старому подходу.', url: 'https://www.youtube.com/embed/dQw4w9WgXcQ' },
-      { id: 'm5a', type: 'audio', title: 'Подкаст: Культура и привычки', description: 'Как поведение людей связано с результатами.', url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
-      { id: 'm5i', type: 'infographic', title: 'Инфографика: Цикл устойчивости', description: 'Стандарт — измерение — обратная связь — улучшение.', url: '' },
-    ],
-  },
-];
+interface CourseBlueprint {
+  area: string;
+  outcomes: [string, string, string];
+  lessonFocus: [string, string, string, string, string];
+}
 
-const quizQuestions: QuizQuestion[] = [
-  { id: 'bq1', question: 'В команде нет понимания, зачем нужны изменения. Первый шаг?', options: ['Запустить пилот без обсуждения', 'Создать ясное обоснование срочности', 'Отложить коммуникацию'], correctIndex: 1, explanation: 'Без понимания «зачем» команда не поддержит изменения. Первый шаг — создать ясное обоснование.' },
-  { id: 'bq2', question: 'Какая комбинация дает лучшую диагностику?', options: ['Только интервью', 'Только KPI', 'Интервью + метрики процесса'], correctIndex: 2, explanation: 'Сочетание качественных и количественных данных дает объемную картину.' },
-  { id: 'bq3', question: 'Что критично для коммуникации изменений?', options: ['Разовая рассылка', 'Регулярность и обратная связь', 'Только комментарии топов'], correctIndex: 1, explanation: 'Регулярная коммуникация с обратной связью снижает тревожность и повышает вовлеченность.' },
-  { id: 'bq4', question: 'Как понять, что быстрая победа удалась?', options: ['Есть измеримый эффект и владелец результата', 'Красивая презентация', 'Меньше жалоб в чате'], correctIndex: 0, explanation: 'Быстрая победа должна быть измеримой и иметь ответственного за результат.' },
-  { id: 'bq5', question: 'Что фиксирует изменение в культуре?', options: ['Один успешный пилот', 'Обновленные стандарты, роли и ритм контроля', 'Формальное закрытие проекта'], correctIndex: 1, explanation: 'Устойчивость обеспечивают обновленные стандарты, назначенные роли и регулярный контроль.' },
-];
+interface CourseModel {
+  lessons: CourseLesson[];
+  quiz: QuizQuestion[];
+}
 
-const TOTAL_DURATION = lessons.reduce((s, l) => s + l.durationMin, 0);
+interface PersistedCourseChecklist {
+  checkedItems: Record<string, number[]>;
+}
+
+const courseBlueprints: Record<string, CourseBlueprint> = {
+  lm1: {
+    area: 'моделей управления изменениями',
+    outcomes: ['единый язык трансформации', 'прозрачный план внедрения', 'измеримый прогресс команды'],
+    lessonFocus: ['базовые модели и роли', 'готовность и диагностика', 'коммуникация и включение', 'пилоты и закрепление', 'масштабирование практик'],
+  },
+  lm2: {
+    area: 'методологии 8 шагов Коттера',
+    outcomes: ['критическая масса сторонников', 'управление коалицией изменений', 'закрепление новых практик'],
+    lessonFocus: ['срочность и коалиция', 'видение и коммуникация', 'барьеры и полномочия', 'быстрые победы', 'закрепление в культуре'],
+  },
+  lm3: {
+    area: 'преодоления сопротивления',
+    outcomes: ['снижение тревожности сотрудников', 'рост принятия изменений', 'конструктивная обратная связь'],
+    lessonFocus: ['типы сопротивления', 'диагностика причин', 'адресные коммуникации', 'поддержка руководителей', 'стандартизация поведения'],
+  },
+  lm4: {
+    area: 'картирования потока ценности',
+    outcomes: ['видимость узких мест', 'сокращение потерь', 'управляемый поток создания ценности'],
+    lessonFocus: ['границы процесса и продукт', 'карта текущего состояния', 'метрики потока', 'карта целевого состояния', 'план изменений VSM'],
+  },
+  lm5: {
+    area: 'цифровой трансформации',
+    outcomes: ['приоритизация цифровых инициатив', 'согласование IT и бизнеса', 'контроль эффекта цифровизации'],
+    lessonFocus: ['контекст и бизнес-цели', 'диагностика зрелости', 'архитектура и процессы', 'пилотные цифровые кейсы', 'масштабирование решений'],
+  },
+  lm6: {
+    area: 'запуска проектов изменений',
+    outcomes: ['структурированный старт', 'прозрачная ответственность', 'снижение рисков старта'],
+    lessonFocus: ['инициация проекта', 'стейкхолдеры и роли', 'ресурсы и сроки', 'контроль рисков', 'ритм управления запуском'],
+  },
+  lm7: {
+    area: 'лидерства в изменениях',
+    outcomes: ['последовательное лидерское поведение', 'доверие команды', 'сильная управленческая коалиция'],
+    lessonFocus: ['роль лидера', 'управленческие сигналы', 'мотивация и признание', 'публичная поддержка', 'устойчивые лидерские ритуалы'],
+  },
+  lm8: {
+    area: 'метрик эффективности',
+    outcomes: ['измеримость изменений', 'связь инициатив и результата', 'прозрачная аналитика прогресса'],
+    lessonFocus: ['архитектура KPI', 'базовые значения', 'декомпозиция метрик', 'мониторинг и сигналы', 'управленческие решения по данным'],
+  },
+  lm9: {
+    area: 'основ TPS и Lean-мышления',
+    outcomes: ['системный подход к потерям', 'стандартная работа', 'постоянные улучшения'],
+    lessonFocus: ['принципы TPS', 'муда и поток', 'стандартизация', 'встроенное качество', 'кайдзен и развитие'],
+  },
+  lm10: {
+    area: 'коммуникации изменений',
+    outcomes: ['единые сообщения для команд', 'безопасная обратная связь', 'управление информационными рисками'],
+    lessonFocus: ['карта аудиторий', 'формулировки и скрипты', 'каналы и частота', 'сложные вопросы', 'коммуникация после запуска'],
+  },
+};
+
+const fallbackBlueprint: CourseBlueprint = {
+  area: 'управления изменениями',
+  outcomes: ['понятная цель курса', 'структурированный план', 'контроль внедрения'],
+  lessonFocus: ['контекст изменений', 'диагностика', 'коммуникация', 'пилот', 'закрепление'],
+};
+
+const lessonNames = ['Контекст', 'Диагностика', 'Коммуникация', 'Практика', 'Закрепление'];
+const lessonDurations = [35, 40, 45, 40, 50];
+
+function buildCourseModel(material: LearningMaterial): CourseModel {
+  const blueprint = courseBlueprints[material.id] ?? fallbackBlueprint;
+
+  const lessons: CourseLesson[] = lessonNames.map((name, index) => {
+    const n = index + 1;
+    const focus = blueprint.lessonFocus[index];
+    return {
+      id: `${material.id}-lesson-${n}`,
+      title: `Занятие ${n}. ${name}: ${focus}`,
+      shortTitle: `${name}`,
+      goal: `Освоить блок "${focus}" в курсе "${material.title}".`,
+      content: `Занятие посвящено теме "${focus}" и показывает, как применять подходы из "${material.title}" в рабочих сценариях.`,
+      durationMin: lessonDurations[index],
+      checklist: [
+        `Определены ключевые действия по теме "${focus}"`,
+        `Зафиксированы роли и зоны ответственности для "${focus}"`,
+        `Собран практический план внедрения по блоку "${focus}"`,
+      ],
+      longread: [
+        `Материал "${material.title}" рассматривает ${blueprint.area} через реальную операционную практику. В этом блоке важно связать цели бизнеса, поведение людей и рабочие процессы, чтобы трансформация была управляемой и предсказуемой.`,
+        `Целевой результат блока: ${blueprint.outcomes[index % blueprint.outcomes.length]}. Для этого команда работает в коротких циклах, использует обратную связь и фиксирует решения на уровне стандартов.`,
+      ],
+      media: [
+        {
+          id: `${material.id}-m${n}v`,
+          type: 'video',
+          title: `Видео: ${focus}`,
+          description: `Разбор темы "${focus}" на примерах курса.`,
+          url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        },
+        {
+          id: `${material.id}-m${n}a`,
+          type: 'audio',
+          title: `Подкаст: ${name}`,
+          description: `Краткий аудиоразбор практики по теме "${focus}".`,
+          url: `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`,
+        },
+        {
+          id: `${material.id}-m${n}i`,
+          type: 'infographic',
+          title: `Инфографика: ${focus}`,
+          description: `Схема действий и контрольных точек по теме "${focus}".`,
+          url: '',
+        },
+      ],
+    };
+  });
+
+  const quiz: QuizQuestion[] = [
+    {
+      id: `${material.id}-q1`,
+      question: `Какой стартовый шаг наиболее корректен для курса "${material.title}"?`,
+      options: ['Сразу запускать масштабирование', 'Уточнить цели и контекст изменений', 'Пропустить диагностику и перейти к отчету'],
+      correctIndex: 1,
+      explanation: 'Постановка целей и контекста задает рамку для всех следующих решений.',
+    },
+    {
+      id: `${material.id}-q2`,
+      question: `Что обязательно включать в диагностику по теме "${blueprint.area}"?`,
+      options: ['Только экспертное мнение', 'Только финансовый отчёт', 'Качественные и количественные данные'],
+      correctIndex: 2,
+      explanation: 'Комбинация данных дает проверяемую картину текущего состояния.',
+    },
+    {
+      id: `${material.id}-q3`,
+      question: 'Какой подход к коммуникации изменений считается устойчивым?',
+      options: ['Разовое объявление', 'Регулярный цикл сообщений и обратной связи', 'Коммуникация только через руководителя проекта'],
+      correctIndex: 1,
+      explanation: 'Ритм и обратная связь снижают сопротивление и удерживают фокус команды.',
+    },
+    {
+      id: `${material.id}-q4`,
+      question: 'Что подтверждает успешность практического внедрения?',
+      options: ['Измеримый результат пилота и назначенный владелец', 'Презентация без метрик', 'Одобрение без проверки'],
+      correctIndex: 0,
+      explanation: 'Пилот должен иметь измеримый эффект и ответственного за масштабирование.',
+    },
+    {
+      id: `${material.id}-q5`,
+      question: 'Как закрепить результат после прохождения курса?',
+      options: ['Ограничиться обучением', 'Оставить изменения на уровне инициативы', 'Встроить практики в стандарты и регулярный контроль'],
+      correctIndex: 2,
+      explanation: 'Устойчивость появляется только после интеграции в рабочую систему управления.',
+    },
+  ];
+
+  return { lessons, quiz };
+}
 
 export default function CourseBasicsPage() {
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
   const { user } = useAuthStore();
-  const { learningProgress, addLearningProgress, updateLearningProgress } = useAppStore();
+  const {
+    learningProgress,
+    lessonProgress,
+    addLearningProgress,
+    updateLearningProgress,
+    addLessonProgress,
+  } = useAppStore();
   const courseMaterial = mockLearningMaterials.find((m) => m.id === id) ?? mockLearningMaterials[0];
   const courseId = courseMaterial.id;
   const courseTitle = courseMaterial.title;
   const courseSummary = courseMaterial.content;
+  const courseModel = useMemo(() => buildCourseModel(courseMaterial), [courseMaterial]);
+  const lessons = courseModel.lessons;
+  const quizQuestions = courseModel.quiz;
 
   const [activeLesson, setActiveLesson] = useState(0);
-  const [completedLessons, setCompletedLessons] = useState<Set<number>>(new Set());
   const [checkedItems, setCheckedItems] = useState<Record<string, Set<number>>>({});
   const [showQuest, setShowQuest] = useState(false);
-  const [questAnswers, setQuestAnswers] = useState<(number | null)[]>(new Array(quizQuestions.length).fill(null));
+  const [questAnswers, setQuestAnswers] = useState<(number | null)[]>([]);
   const [questSubmitted, setQuestSubmitted] = useState(false);
 
   const userId = user?.id || 'u1';
   const progressRecord = learningProgress.find(lp => lp.user_id === userId && lp.material_id === courseId);
-  const overallPercent = Math.round(((completedLessons.size + (questSubmitted ? 1 : 0)) / (lessons.length + 1)) * 100);
+  const completedLessonIds = useMemo(
+    () =>
+      new Set(
+        lessonProgress
+          .filter((lp) => lp.user_id === userId && lp.material_id === courseId)
+          .map((lp) => lp.lesson_id),
+      ),
+    [courseId, lessonProgress, userId],
+  );
+  const completedLessonsCount = completedLessonIds.size;
+  const checklistStorageKey = `cf-course-checklist:${userId}:${courseId}`;
+  const totalDuration = useMemo(() => lessons.reduce((s, lesson) => s + lesson.durationMin, 0), [lessons]);
+  const overallPercent = Math.round((completedLessonsCount / lessons.length) * 100);
 
-  const isLessonUnlocked = (index: number) => index === 0 || completedLessons.has(index - 1);
+  useEffect(() => {
+    setActiveLesson(0);
+    setShowQuest(false);
+    setQuestAnswers(new Array(quizQuestions.length).fill(null));
+    setQuestSubmitted(Boolean(progressRecord?.completed_at));
+  }, [progressRecord?.completed_at, quizQuestions.length]);
+
+  useEffect(() => {
+    const persisted = localStorage.getItem(checklistStorageKey);
+    if (!persisted) {
+      setCheckedItems({});
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(persisted) as PersistedCourseChecklist;
+      setCheckedItems(
+        Object.fromEntries(
+          Object.entries(parsed.checkedItems ?? {}).map(([lessonId, items]) => [lessonId, new Set(items)]),
+        ),
+      );
+    } catch {
+      setCheckedItems({});
+    }
+  }, [checklistStorageKey]);
+
+  useEffect(() => {
+    const payload: PersistedCourseChecklist = {
+      checkedItems: Object.fromEntries(
+        Object.entries(checkedItems).map(([lessonId, items]) => [lessonId, Array.from(items.values()).sort((a, b) => a - b)]),
+      ),
+    };
+    localStorage.setItem(checklistStorageKey, JSON.stringify(payload));
+  }, [checkedItems, checklistStorageKey]);
+
+  const isLessonUnlocked = (index: number) => index === 0 || completedLessonIds.has(lessons[index - 1].id);
+
+  const upsertCourseProgress = (lessonCount: number, completedAt?: string) => {
+    const progressPercent = Math.round((lessonCount / lessons.length) * 100);
+    if (progressRecord) {
+      updateLearningProgress(progressRecord.id, {
+        progress_percent: progressPercent,
+        completed_at: completedAt ?? progressRecord.completed_at,
+      });
+      return;
+    }
+
+    addLearningProgress({
+      id: `ulp-${courseId}-${Date.now()}`,
+      user_id: userId,
+      material_id: courseId,
+      progress_percent: progressPercent,
+      completed_at: completedAt,
+    });
+  };
 
   const markLessonComplete = (lessonIndex: number) => {
-    setCompletedLessons(prev => new Set(prev).add(lessonIndex));
-    const pct = Math.round(((completedLessons.size + 1) / (lessons.length + 1)) * 100);
-    if (progressRecord) {
-      updateLearningProgress(progressRecord.id, { progress_percent: pct });
-    } else {
-      addLearningProgress({ id: 'ulp' + Date.now(), user_id: userId, material_id: courseId, progress_percent: pct });
-    }
+    const lessonId = lessons[lessonIndex].id;
+    if (completedLessonIds.has(lessonId)) return;
+
+    addLessonProgress({
+      id: `lp-${courseId}-${lessonId}-${Date.now()}`,
+      user_id: userId,
+      material_id: courseId,
+      lesson_id: lessonId,
+      completed_at: new Date().toISOString(),
+    });
+    upsertCourseProgress(completedLessonsCount + 1);
   };
 
   const toggleCheckItem = (lessonId: string, itemIndex: number) => {
@@ -210,11 +332,7 @@ export default function CourseBasicsPage() {
 
   const handleQuestSubmit = () => {
     setQuestSubmitted(true);
-    if (progressRecord) {
-      updateLearningProgress(progressRecord.id, { progress_percent: 100, completed_at: new Date().toISOString() });
-    } else {
-      addLearningProgress({ id: 'ulp' + Date.now(), user_id: userId, material_id: courseId, progress_percent: 100, completed_at: new Date().toISOString() });
-    }
+    upsertCourseProgress(completedLessonsCount, new Date().toISOString());
   };
 
   const questScore = questAnswers.reduce<number>((acc, a, i) => acc + (a === quizQuestions[i].correctIndex ? 1 : 0), 0);
@@ -271,7 +389,6 @@ export default function CourseBasicsPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-4rem)]">
-      {/* Header */}
       <div className="border-b border-border bg-card px-6 py-4 space-y-3 shrink-0">
         <div className="flex items-center gap-3">
           <Button variant="ghost" size="icon" onClick={() => navigate('/learning')}>
@@ -282,25 +399,23 @@ export default function CourseBasicsPage() {
             <p className="text-sm text-muted-foreground">{courseSummary}</p>
           </div>
           <Badge variant="secondary" className="text-xs shrink-0">
-            <Clock className="h-3 w-3 mr-1" /> ~{TOTAL_DURATION} мин
+            <Clock className="h-3 w-3 mr-1" /> ~{totalDuration} мин
           </Badge>
         </div>
         <div className="flex items-center gap-3">
           <Progress value={overallPercent} className="h-2 flex-1" />
           <span className="text-sm font-bold text-primary whitespace-nowrap">{overallPercent}%</span>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">{completedLessons.size}/{lessons.length} занятий</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{completedLessonsCount}/{lessons.length} занятий</span>
         </div>
       </div>
 
-      {/* Two-column layout */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Sidebar */}
         <aside className="w-72 border-r border-border bg-card shrink-0 flex flex-col">
           <ScrollArea className="flex-1">
             <div className="p-3 space-y-1">
               {lessons.map((lesson, i) => {
                 const unlocked = isLessonUnlocked(i);
-                const completed = completedLessons.has(i);
+                const completed = completedLessonIds.has(lesson.id);
                 const isActive = activeLesson === i && !showQuest;
 
                 return (
@@ -336,12 +451,12 @@ export default function CourseBasicsPage() {
               <Separator className="my-2" />
 
               <button
-                disabled={completedLessons.size < lessons.length}
+                disabled={completedLessonsCount < lessons.length}
                 onClick={() => setShowQuest(true)}
                 className={`w-full text-left rounded-lg px-3 py-2.5 transition-colors text-sm flex items-center gap-3 ${
                   showQuest
                     ? 'bg-primary/10 text-primary font-medium'
-                    : completedLessons.size >= lessons.length
+                    : completedLessonsCount >= lessons.length
                       ? 'hover:bg-muted text-foreground'
                       : 'text-muted-foreground opacity-60 cursor-not-allowed'
                 }`}
@@ -349,7 +464,7 @@ export default function CourseBasicsPage() {
                 <div className="shrink-0">
                   {questSubmitted ? (
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
-                  ) : completedLessons.size < lessons.length ? (
+                  ) : completedLessonsCount < lessons.length ? (
                     <Lock className="h-4 w-4" />
                   ) : (
                     <Trophy className="h-4 w-4" />
@@ -364,12 +479,10 @@ export default function CourseBasicsPage() {
           </ScrollArea>
         </aside>
 
-        {/* Main content */}
         <main className="flex-1 overflow-y-auto">
           <div className="max-w-3xl mx-auto p-6 space-y-6">
             {!showQuest ? (
               <>
-                {/* Lesson header */}
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <Badge variant="secondary" className="text-xs">Занятие {activeLesson + 1}</Badge>
@@ -383,7 +496,6 @@ export default function CourseBasicsPage() {
 
                 <Separator />
 
-                {/* Longread */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-primary" />
@@ -404,7 +516,6 @@ export default function CourseBasicsPage() {
                   ))}
                 </div>
 
-                {/* Media */}
                 {currentLesson.media.length > 0 && (
                   <div className="space-y-4">
                     <Separator />
@@ -412,7 +523,6 @@ export default function CourseBasicsPage() {
                   </div>
                 )}
 
-                {/* Checklist */}
                 <div className="space-y-3">
                   <Separator />
                   <h3 className="text-lg font-semibold text-foreground">Практические шаги</h3>
@@ -435,7 +545,6 @@ export default function CourseBasicsPage() {
                   </div>
                 </div>
 
-                {/* Actions */}
                 <Separator />
                 <div className="flex items-center justify-between">
                   <Button
@@ -448,7 +557,7 @@ export default function CourseBasicsPage() {
                   </Button>
 
                   <div className="flex gap-2">
-                    {!completedLessons.has(activeLesson) ? (
+                    {!completedLessonIds.has(lessons[activeLesson].id) ? (
                       <Button size="sm" onClick={() => markLessonComplete(activeLesson)}>
                         <CheckCircle2 className="h-4 w-4 mr-1" /> Завершить занятие
                       </Button>
@@ -462,7 +571,7 @@ export default function CourseBasicsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    disabled={activeLesson === lessons.length - 1 || !completedLessons.has(activeLesson)}
+                    disabled={activeLesson === lessons.length - 1 || !completedLessonIds.has(lessons[activeLesson].id)}
                     onClick={() => setActiveLesson(prev => prev + 1)}
                   >
                     Далее <ArrowRight className="h-4 w-4 ml-1" />
@@ -470,7 +579,6 @@ export default function CourseBasicsPage() {
                 </div>
               </>
             ) : (
-              /* Quest */
               <Card>
                 <CardHeader>
                   <div className="flex items-center gap-2">
@@ -533,9 +641,9 @@ export default function CourseBasicsPage() {
                         Результат: {questScore}/{quizQuestions.length}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {questScore >= 4 ? '🎉 Отлично! Вы отлично усвоили материал.' :
-                         questScore >= 3 ? '👍 Хороший результат. Повторите отдельные темы.' :
-                         '📚 Рекомендуем пройти занятия ещё раз.'}
+                        {questScore >= 4 ? 'Отлично! Вы хорошо усвоили материал.' :
+                         questScore >= 3 ? 'Хороший результат. Повторите отдельные темы.' :
+                         'Рекомендуем пройти занятия еще раз.'}
                       </p>
                     </div>
                   )}
@@ -548,4 +656,3 @@ export default function CourseBasicsPage() {
     </div>
   );
 }
-

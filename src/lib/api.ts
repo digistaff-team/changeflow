@@ -1,5 +1,6 @@
 import type {
   Feedback,
+  LessonProgress,
   Project,
   ProjectStep,
   User,
@@ -50,6 +51,7 @@ export type BootstrapResponse = {
   projectSteps: ProjectStep[];
   feedback: Feedback[];
   learningProgress: UserLearningProgress[];
+  lessonProgress: LessonProgress[];
   aiConversations: {
     id: string;
     user_id: string;
@@ -118,6 +120,18 @@ export const api = {
   },
   updateLearningProgress(id: string, updates: Partial<UserLearningProgress>) {
     return request<{ learningProgress: UserLearningProgress }>(`/learning-progress/${id}`, {
+      method: 'PATCH',
+      body: { updates },
+    });
+  },
+  createLessonProgress(progress: LessonProgress) {
+    return request<{ lessonProgress: LessonProgress }>('/lesson-progress', {
+      method: 'POST',
+      body: { progress },
+    });
+  },
+  updateLessonProgress(id: string, updates: Partial<LessonProgress>) {
+    return request<{ lessonProgress: LessonProgress }>(`/lesson-progress/${id}`, {
       method: 'PATCH',
       body: { updates },
     });

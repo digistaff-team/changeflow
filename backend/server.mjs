@@ -133,6 +133,7 @@ const server = http.createServer(async (req, res) => {
         projectSteps: db.projectSteps,
         feedback: db.feedback,
         learningProgress: db.learningProgress,
+        lessonProgress: db.lessonProgress || [],
         aiConversations: db.aiConversations,
       });
       return;
@@ -215,6 +216,46 @@ const server = http.createServer(async (req, res) => {
       db.learningProgress[index] = { ...db.learningProgress[index], ...body.updates };
       writeDb(db);
       json(res, 200, { learningProgress: db.learningProgress[index] });
+      return;
+    }
+
+    if (req.method === 'POST' && pathname === '/api/lesson-progress') {
+      const body = await parseBody(req);
+      const progress = body.progress;
+      const list = db.lessonProgress || [];
+      const existingIndex = list.findIndex(
+        (lp) =>
+          lp.user_id === progress.user_id
+          && lp.material_id === progress.material_id
+          && lp.lesson_id === progress.lesson_id,
+      );
+      if (existingIndex >= 0) {
+        list[existingIndex] = { ...list[existingIndex], ...progress };
+        db.lessonProgress = list;
+        writeDb(db);
+        json(res, 200, { lessonProgress: list[existingIndex] });
+        return;
+      }
+      list.push(progress);
+      db.lessonProgress = list;
+      writeDb(db);
+      json(res, 201, { lessonProgress: progress });
+      return;
+    }
+
+    if (req.method === 'PATCH' && pathname.startsWith('/api/lesson-progress/')) {
+      const id = pathname.split('/').pop();
+      const body = await parseBody(req);
+      const list = db.lessonProgress || [];
+      const index = list.findIndex((lp) => lp.id === id);
+      if (index === -1) {
+        json(res, 404, { error: 'Lesson progress not found' });
+        return;
+      }
+      list[index] = { ...list[index], ...body.updates };
+      db.lessonProgress = list;
+      writeDb(db);
+      json(res, 200, { lessonProgress: list[index] });
       return;
     }
 

@@ -1,6 +1,6 @@
 import type {
   Tenant, User, ChangeAlgorithmTemplate, TemplateStep,
-  Project, ProjectStep, Feedback, LearningMaterial, UserLearningProgress
+  Project, ProjectStep, Feedback, LearningMaterial, UserLearningProgress, LessonProgress
 } from '@/types';
 
 export const mockTenant: Tenant = {
@@ -121,4 +121,12 @@ export const mockLearningProgress: UserLearningProgress[] = [
   { id: 'ulp3', user_id: 'u2', material_id: 'lm1', progress_percent: 60 },
   { id: 'ulp4', user_id: 'u2', material_id: 'lm4', completed_at: '2025-10-10T09:00:00Z', progress_percent: 100 },
   { id: 'ulp5', user_id: 'u3', material_id: 'lm1', progress_percent: 30 },
+];
+
+export const mockLessonProgress: LessonProgress[] = [
+  { id: 'lp1', user_id: 'u1', material_id: 'lm1', lesson_id: 'lm1-lesson-1', completed_at: '2025-10-01T10:00:00Z' },
+  { id: 'lp2', user_id: 'u1', material_id: 'lm1', lesson_id: 'lm1-lesson-2', completed_at: '2025-10-01T10:40:00Z' },
+  { id: 'lp3', user_id: 'u1', material_id: 'lm1', lesson_id: 'lm1-lesson-3', completed_at: '2025-10-01T11:15:00Z' },
+  { id: 'lp4', user_id: 'u1', material_id: 'lm1', lesson_id: 'lm1-lesson-4', completed_at: '2025-10-01T11:40:00Z' },
+  { id: 'lp5', user_id: 'u1', material_id: 'lm1', lesson_id: 'lm1-lesson-5', completed_at: '2025-10-01T11:55:00Z' },
 ];

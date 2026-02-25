@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import type { Project, ProjectStep, Feedback, UserLearningProgress, AiConversation } from '@/types';
-import { mockProjects, mockProjectSteps, mockFeedback, mockLearningProgress } from '@/data/mock-data';
+import type { Project, ProjectStep, Feedback, UserLearningProgress, AiConversation, LessonProgress } from '@/types';
+import { mockProjects, mockProjectSteps, mockFeedback, mockLearningProgress, mockLessonProgress } from '@/data/mock-data';
 import { api } from '@/lib/api';
 
 interface AppState {
@@ -8,6 +8,7 @@ interface AppState {
   projectSteps: ProjectStep[];
   feedback: Feedback[];
   learningProgress: UserLearningProgress[];
+  lessonProgress: LessonProgress[];
   aiConversations: AiConversation[];
   isLoading: boolean;
   isLoaded: boolean;
@@ -19,6 +20,8 @@ interface AppState {
   updateFeedbackStatus: (id: string, status: Feedback['status']) => void;
   addLearningProgress: (progress: UserLearningProgress) => void;
   updateLearningProgress: (id: string, updates: Partial<UserLearningProgress>) => void;
+  addLessonProgress: (progress: LessonProgress) => void;
+  updateLessonProgress: (id: string, updates: Partial<LessonProgress>) => void;
   addAiMessage: (msg: AiConversation) => void;
   bootstrap: () => Promise<void>;
   reset: () => void;
@@ -29,6 +32,7 @@ export const useAppStore = create<AppState>((set) => ({
   projectSteps: mockProjectSteps,
   feedback: mockFeedback,
   learningProgress: mockLearningProgress,
+  lessonProgress: mockLessonProgress,
   aiConversations: [],
   isLoading: false,
   isLoaded: false,
@@ -116,6 +120,18 @@ export const useAppStore = create<AppState>((set) => ({
     }));
     void api.updateLearningProgress(id, updates);
   },
+  addLessonProgress: (progress) => {
+    set((s) => ({
+      lessonProgress: [...s.lessonProgress, progress],
+    }));
+    void api.createLessonProgress(progress);
+  },
+  updateLessonProgress: (id, updates) => {
+    set((s) => ({
+      lessonProgress: s.lessonProgress.map(lp => lp.id === id ? { ...lp, ...updates } : lp),
+    }));
+    void api.updateLessonProgress(id, updates);
+  },
   addAiMessage: (msg) => {
     set((s) => ({
       aiConversations: [...s.aiConversations, msg],
@@ -131,6 +147,7 @@ export const useAppStore = create<AppState>((set) => ({
         projectSteps: data.projectSteps,
         feedback: data.feedback,
         learningProgress: data.learningProgress,
+        lessonProgress: data.lessonProgress,
         aiConversations: data.aiConversations,
         isLoaded: true,
         isLoading: false,
@@ -145,6 +162,7 @@ export const useAppStore = create<AppState>((set) => ({
       projectSteps: [],
       feedback: [],
       learningProgress: [],
+      lessonProgress: [],
       aiConversations: [],
       isLoaded: false,
       isLoading: false,
