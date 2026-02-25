@@ -1,4 +1,4 @@
-import { useAppStore } from '@/stores/app-store';
+﻿import { useAppStore } from '@/stores/app-store';
 import { mockTemplates } from '@/data/mock-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -6,12 +6,22 @@ import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { Plus } from 'lucide-react';
+import { t } from '@/lib/i18n';
 
 const statusLabels: Record<string, string> = {
-  planning: 'Планирование', in_progress: 'В работе', on_hold: 'На паузе', completed: 'Завершён', cancelled: 'Отменён',
+  planning: t('projects.status.planning'),
+  in_progress: t('projects.status.in_progress'),
+  on_hold: t('projects.status.on_hold'),
+  completed: t('projects.status.completed'),
+  cancelled: t('projects.status.cancelled'),
 };
+
 const statusColors: Record<string, string> = {
-  planning: 'bg-blue-100 text-blue-800', in_progress: 'bg-amber-100 text-amber-800', on_hold: 'bg-gray-100 text-gray-800', completed: 'bg-green-100 text-green-800', cancelled: 'bg-red-100 text-red-800',
+  planning: 'bg-blue-100 text-blue-800',
+  in_progress: 'bg-amber-100 text-amber-800',
+  on_hold: 'bg-gray-100 text-gray-800',
+  completed: 'bg-green-100 text-green-800',
+  cancelled: 'bg-red-100 text-red-800',
 };
 
 export default function ProjectsPage() {
@@ -22,17 +32,17 @@ export default function ProjectsPage() {
     <div className="p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-foreground">Проекты</h1>
-          <p className="text-muted-foreground">Управление программами изменений</p>
+          <h1 className="text-2xl font-bold text-foreground">{t('projects.title')}</h1>
+          <p className="text-muted-foreground">{t('projects.subtitle')}</p>
         </div>
         <Button onClick={() => navigate('/projects/new')}>
-          <Plus className="h-4 w-4 mr-2" /> Новый проект
+          <Plus className="h-4 w-4 mr-2" /> {t('projects.newProject')}
         </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {projects.map(project => {
-          const template = mockTemplates.find(t => t.id === project.template_id);
+          const template = mockTemplates.find(tp => tp.id === project.template_id);
           return (
             <Card key={project.id} className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => navigate(`/projects/${project.id}`)}>
               <CardHeader className="pb-3">
@@ -46,12 +56,14 @@ export default function ProjectsPage() {
                 {project.description && <p className="text-sm text-muted-foreground mb-3">{project.description}</p>}
                 <div className="space-y-1">
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Прогресс</span>
+                    <span>{t('projects.progress')}</span>
                     <span>{project.progress_percent}%</span>
                   </div>
                   <Progress value={project.progress_percent} className="h-2" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">Начало: {new Date(project.start_date).toLocaleDateString('ru-RU')}</p>
+                <p className="text-xs text-muted-foreground mt-2">
+                  {t('projects.start')}: {new Date(project.start_date).toLocaleDateString('ru-RU')}
+                </p>
               </CardContent>
             </Card>
           );

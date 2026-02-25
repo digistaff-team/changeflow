@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
 import { mockUsers } from '@/data/mock-data';
@@ -9,36 +9,72 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { FeedbackType, Sentiment } from '@/types';
 import { MessageSquare, ThumbsUp, AlertCircle, HelpCircle, Award, Send } from 'lucide-react';
+import { t, tm } from '@/lib/i18n';
 
-const feedbackTypeLabels: Record<string, string> = { suggestion: 'Предложение', concern: 'Опасение', question: 'Вопрос', praise: 'Похвала' };
-const feedbackTypeIcons: Record<string, React.ElementType> = { suggestion: ThumbsUp, concern: AlertCircle, question: HelpCircle, praise: Award };
-const sentimentLabels: Record<string, string> = { positive: 'Позитивный', neutral: 'Нейтральный', negative: 'Негативный' };
-const sentimentColors: Record<string, string> = { positive: 'bg-green-100 text-green-800', neutral: 'bg-yellow-100 text-yellow-800', negative: 'bg-red-100 text-red-800' };
-const statusLabels: Record<string, string> = { new: 'Новый', reviewed: 'Рассмотрен', in_progress: 'В работе', resolved: 'Решён' };
-const analysisLabels: Record<string, string> = { pending: 'Анализируется', completed: 'Проанализирован', analysis_failed: 'Ошибка AI-анализа' };
-const analysisColors: Record<string, string> = { pending: 'bg-blue-100 text-blue-800', completed: 'bg-emerald-100 text-emerald-800', analysis_failed: 'bg-slate-100 text-slate-700' };
+const feedbackTypeLabels: Record<string, string> = {
+  suggestion: t('feedback.type.suggestion'),
+  concern: t('feedback.type.concern'),
+  question: t('feedback.type.question'),
+  praise: t('feedback.type.praise'),
+};
 
-const NEGATIVE_HINTS = ['непонят', 'проблем', 'ошибк', 'сопротив', 'риск', 'сложно'];
-const POSITIVE_HINTS = ['понят', 'отличн', 'улучш', 'полез', 'хорош'];
+const feedbackTypeIcons: Record<string, React.ElementType> = {
+  suggestion: ThumbsUp,
+  concern: AlertCircle,
+  question: HelpCircle,
+  praise: Award,
+};
+
+const sentimentLabels: Record<string, string> = {
+  positive: t('feedback.sentiment.positive'),
+  neutral: t('feedback.sentiment.neutral'),
+  negative: t('feedback.sentiment.negative'),
+};
+
+const sentimentColors: Record<string, string> = {
+  positive: 'bg-green-100 text-green-800',
+  neutral: 'bg-yellow-100 text-yellow-800',
+  negative: 'bg-red-100 text-red-800',
+};
+
+const statusLabels: Record<string, string> = {
+  new: t('feedback.status.new'),
+  reviewed: t('feedback.status.reviewed'),
+  in_progress: t('feedback.status.in_progress'),
+  resolved: t('feedback.status.resolved'),
+};
+
+const analysisLabels: Record<string, string> = {
+  pending: t('feedback.analysis.pending'),
+  completed: t('feedback.analysis.completed'),
+  analysis_failed: t('feedback.analysis.analysis_failed'),
+};
+
+const analysisColors: Record<string, string> = {
+  pending: 'bg-blue-100 text-blue-800',
+  completed: 'bg-emerald-100 text-emerald-800',
+  analysis_failed: 'bg-slate-100 text-slate-700',
+};
+
+const NEGATIVE_HINTS = tm<string[]>('feedback.hints.negative');
+const POSITIVE_HINTS = tm<string[]>('feedback.hints.positive');
 
 async function analyzeFeedback(message: string): Promise<{ sentiment: Sentiment; score: number; tags: string[] }> {
   await new Promise(resolve => setTimeout(resolve, 500));
-  if (Math.random() < 0.2) {
-    throw new Error('AI analysis unavailable');
-  }
+  if (Math.random() < 0.2) throw new Error('AI analysis unavailable');
 
   const lower = message.toLowerCase();
   const hasNegative = NEGATIVE_HINTS.some(hint => lower.includes(hint));
   const hasPositive = POSITIVE_HINTS.some(hint => lower.includes(hint));
 
   if (hasNegative) {
-    return { sentiment: 'negative', score: 0.82, tags: ['процессы', 'сопротивление'] };
+    return { sentiment: 'negative', score: 0.82, tags: tm<string[]>('feedback.tags.negative') };
   }
   if (hasPositive) {
-    return { sentiment: 'positive', score: 0.76, tags: ['вовлеченность'] };
+    return { sentiment: 'positive', score: 0.76, tags: tm<string[]>('feedback.tags.positive') };
   }
 
-  return { sentiment: 'neutral', score: 0.53, tags: ['обратная связь'] };
+  return { sentiment: 'neutral', score: 0.53, tags: tm<string[]>('feedback.tags.neutral') };
 }
 
 export default function FeedbackPage() {
@@ -54,7 +90,7 @@ export default function FeedbackPage() {
     if (!message.trim() || !projectId || isSubmitting) return;
 
     setIsSubmitting(true);
-    const feedbackId = 'f' + Date.now();
+    const feedbackId = `f${Date.now()}`;
 
     addFeedback({
       id: feedbackId,
@@ -95,42 +131,44 @@ export default function FeedbackPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Обратная связь</h1>
-        <p className="text-muted-foreground">Делитесь мнением о проектах изменений</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('feedback.title')}</h1>
+        <p className="text-muted-foreground">{t('feedback.subtitle')}</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Submit form */}
         <Card className="lg:col-span-1">
-          <CardHeader><CardTitle className="text-base">Новый отзыв</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-base">{t('feedback.new')}</CardTitle></CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <Select value={projectId} onValueChange={setProjectId}>
-                <SelectTrigger><SelectValue placeholder="Выберите проект" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder={t('feedback.projectPlaceholder')} /></SelectTrigger>
                 <SelectContent>
-                  {projects.map(p => <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>)}
+                  {projects.map(project => <SelectItem key={project.id} value={project.id}>{project.name}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Select value={type} onValueChange={v => setType(v as FeedbackType)}>
+
+              <Select value={type} onValueChange={value => setType(value as FeedbackType)}>
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  {Object.entries(feedbackTypeLabels).map(([k, v]) => <SelectItem key={k} value={k}>{v}</SelectItem>)}
+                  {Object.entries(feedbackTypeLabels).map(([key, value]) => <SelectItem key={key} value={key}>{value}</SelectItem>)}
                 </SelectContent>
               </Select>
-              <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder="Ваш отзыв..." rows={4} />
+
+              <Textarea value={message} onChange={e => setMessage(e.target.value)} placeholder={t('feedback.messagePlaceholder')} rows={4} />
+
               <Button type="submit" className="w-full" disabled={!message.trim() || !projectId || isSubmitting}>
-                <Send className="h-4 w-4 mr-2" /> Отправить
+                <Send className="h-4 w-4 mr-2" /> {t('feedback.send')}
               </Button>
             </form>
           </CardContent>
         </Card>
 
-        {/* Feedback list */}
         <div className="lg:col-span-2 space-y-3">
           {feedback.map(fb => {
             const Icon = feedbackTypeIcons[fb.feedback_type] || MessageSquare;
-            const author = mockUsers.find(u => u.id === fb.user_id);
-            const project = projects.find(p => p.id === fb.project_id);
+            const author = mockUsers.find(userItem => userItem.id === fb.user_id);
+            const project = projects.find(projectItem => projectItem.id === fb.project_id);
+
             return (
               <Card key={fb.id}>
                 <CardContent className="p-4">

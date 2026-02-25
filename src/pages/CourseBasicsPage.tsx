@@ -11,6 +11,7 @@ import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { t, tm } from '@/lib/i18n';
 import {
   ArrowLeft, ArrowRight, CheckCircle2, Play, Headphones,
   BarChart3, Trophy, Clock, Lock, BookOpen,
@@ -59,66 +60,9 @@ interface PersistedCourseChecklist {
   checkedItems: Record<string, number[]>;
 }
 
-const courseBlueprints: Record<string, CourseBlueprint> = {
-  lm1: {
-    area: 'моделей управления изменениями',
-    outcomes: ['единый язык трансформации', 'прозрачный план внедрения', 'измеримый прогресс команды'],
-    lessonFocus: ['базовые модели и роли', 'готовность и диагностика', 'коммуникация и включение', 'пилоты и закрепление', 'масштабирование практик'],
-  },
-  lm2: {
-    area: 'методологии 8 шагов Коттера',
-    outcomes: ['критическая масса сторонников', 'управление коалицией изменений', 'закрепление новых практик'],
-    lessonFocus: ['срочность и коалиция', 'видение и коммуникация', 'барьеры и полномочия', 'быстрые победы', 'закрепление в культуре'],
-  },
-  lm3: {
-    area: 'преодоления сопротивления',
-    outcomes: ['снижение тревожности сотрудников', 'рост принятия изменений', 'конструктивная обратная связь'],
-    lessonFocus: ['типы сопротивления', 'диагностика причин', 'адресные коммуникации', 'поддержка руководителей', 'стандартизация поведения'],
-  },
-  lm4: {
-    area: 'картирования потока ценности',
-    outcomes: ['видимость узких мест', 'сокращение потерь', 'управляемый поток создания ценности'],
-    lessonFocus: ['границы процесса и продукт', 'карта текущего состояния', 'метрики потока', 'карта целевого состояния', 'план изменений VSM'],
-  },
-  lm5: {
-    area: 'цифровой трансформации',
-    outcomes: ['приоритизация цифровых инициатив', 'согласование IT и бизнеса', 'контроль эффекта цифровизации'],
-    lessonFocus: ['контекст и бизнес-цели', 'диагностика зрелости', 'архитектура и процессы', 'пилотные цифровые кейсы', 'масштабирование решений'],
-  },
-  lm6: {
-    area: 'запуска проектов изменений',
-    outcomes: ['структурированный старт', 'прозрачная ответственность', 'снижение рисков старта'],
-    lessonFocus: ['инициация проекта', 'стейкхолдеры и роли', 'ресурсы и сроки', 'контроль рисков', 'ритм управления запуском'],
-  },
-  lm7: {
-    area: 'лидерства в изменениях',
-    outcomes: ['последовательное лидерское поведение', 'доверие команды', 'сильная управленческая коалиция'],
-    lessonFocus: ['роль лидера', 'управленческие сигналы', 'мотивация и признание', 'публичная поддержка', 'устойчивые лидерские ритуалы'],
-  },
-  lm8: {
-    area: 'метрик эффективности',
-    outcomes: ['измеримость изменений', 'связь инициатив и результата', 'прозрачная аналитика прогресса'],
-    lessonFocus: ['архитектура KPI', 'базовые значения', 'декомпозиция метрик', 'мониторинг и сигналы', 'управленческие решения по данным'],
-  },
-  lm9: {
-    area: 'основ TPS и Lean-мышления',
-    outcomes: ['системный подход к потерям', 'стандартная работа', 'постоянные улучшения'],
-    lessonFocus: ['принципы TPS', 'муда и поток', 'стандартизация', 'встроенное качество', 'кайдзен и развитие'],
-  },
-  lm10: {
-    area: 'коммуникации изменений',
-    outcomes: ['единые сообщения для команд', 'безопасная обратная связь', 'управление информационными рисками'],
-    lessonFocus: ['карта аудиторий', 'формулировки и скрипты', 'каналы и частота', 'сложные вопросы', 'коммуникация после запуска'],
-  },
-};
-
-const fallbackBlueprint: CourseBlueprint = {
-  area: 'управления изменениями',
-  outcomes: ['понятная цель курса', 'структурированный план', 'контроль внедрения'],
-  lessonFocus: ['контекст изменений', 'диагностика', 'коммуникация', 'пилот', 'закрепление'],
-};
-
-const lessonNames = ['Контекст', 'Диагностика', 'Коммуникация', 'Практика', 'Закрепление'];
+const courseBlueprints: Record<string, CourseBlueprint> = tm<Record<string, CourseBlueprint>>('courseBasics.blueprints');
+const fallbackBlueprint: CourseBlueprint = tm<CourseBlueprint>('courseBasics.fallback');
+const lessonNames = tm<string[]>('courseBasics.lessonNames');
 const lessonDurations = [35, 40, 45, 40, 50];
 
 function buildCourseModel(material: LearningMaterial): CourseModel {
@@ -129,40 +73,40 @@ function buildCourseModel(material: LearningMaterial): CourseModel {
     const focus = blueprint.lessonFocus[index];
     return {
       id: `${material.id}-lesson-${n}`,
-      title: `Занятие ${n}. ${name}: ${focus}`,
+      title: t('courseBasics.lesson.title', { n, name, focus }),
       shortTitle: `${name}`,
-      goal: `Освоить блок "${focus}" в курсе "${material.title}".`,
-      content: `Занятие посвящено теме "${focus}" и показывает, как применять подходы из "${material.title}" в рабочих сценариях.`,
+      goal: t('courseBasics.lesson.goal', { focus, title: material.title }),
+      content: t('courseBasics.lesson.content', { focus, title: material.title }),
       durationMin: lessonDurations[index],
       checklist: [
-        `Определены ключевые действия по теме "${focus}"`,
-        `Зафиксированы роли и зоны ответственности для "${focus}"`,
-        `Собран практический план внедрения по блоку "${focus}"`,
+        t('courseBasics.lesson.check1', { focus }),
+        t('courseBasics.lesson.check2', { focus }),
+        t('courseBasics.lesson.check3', { focus }),
       ],
       longread: [
-        `Материал "${material.title}" рассматривает ${blueprint.area} через реальную операционную практику. В этом блоке важно связать цели бизнеса, поведение людей и рабочие процессы, чтобы трансформация была управляемой и предсказуемой.`,
-        `Целевой результат блока: ${blueprint.outcomes[index % blueprint.outcomes.length]}. Для этого команда работает в коротких циклах, использует обратную связь и фиксирует решения на уровне стандартов.`,
+        t('courseBasics.lesson.long1', { title: material.title, area: blueprint.area }),
+        t('courseBasics.lesson.long2', { outcome: blueprint.outcomes[index % blueprint.outcomes.length] }),
       ],
       media: [
         {
           id: `${material.id}-m${n}v`,
           type: 'video',
-          title: `Видео: ${focus}`,
-          description: `Разбор темы "${focus}" на примерах курса.`,
+          title: t('courseBasics.lesson.video', { focus }),
+          description: t('courseBasics.lesson.videoDescription', { focus }),
           url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
         },
         {
           id: `${material.id}-m${n}a`,
           type: 'audio',
-          title: `Подкаст: ${name}`,
-          description: `Краткий аудиоразбор практики по теме "${focus}".`,
+          title: t('courseBasics.lesson.audio', { name }),
+          description: t('courseBasics.lesson.audioDescription', { focus }),
           url: `https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${n}.mp3`,
         },
         {
           id: `${material.id}-m${n}i`,
           type: 'infographic',
-          title: `Инфографика: ${focus}`,
-          description: `Схема действий и контрольных точек по теме "${focus}".`,
+          title: t('courseBasics.lesson.infographic', { focus }),
+          description: t('courseBasics.lesson.infographicDescription', { focus }),
           url: '',
         },
       ],
@@ -172,38 +116,38 @@ function buildCourseModel(material: LearningMaterial): CourseModel {
   const quiz: QuizQuestion[] = [
     {
       id: `${material.id}-q1`,
-      question: `Какой стартовый шаг наиболее корректен для курса "${material.title}"?`,
-      options: ['Сразу запускать масштабирование', 'Уточнить цели и контекст изменений', 'Пропустить диагностику и перейти к отчету'],
+      question: t('courseBasics.quiz.q1', { title: material.title }),
+      options: tm<string[]>('courseBasics.quiz.q1_options'),
       correctIndex: 1,
-      explanation: 'Постановка целей и контекста задает рамку для всех следующих решений.',
+      explanation: t('courseBasics.quiz.e1'),
     },
     {
       id: `${material.id}-q2`,
-      question: `Что обязательно включать в диагностику по теме "${blueprint.area}"?`,
-      options: ['Только экспертное мнение', 'Только финансовый отчёт', 'Качественные и количественные данные'],
+      question: t('courseBasics.quiz.q2', { area: blueprint.area }),
+      options: tm<string[]>('courseBasics.quiz.q2_options'),
       correctIndex: 2,
-      explanation: 'Комбинация данных дает проверяемую картину текущего состояния.',
+      explanation: t('courseBasics.quiz.e2'),
     },
     {
       id: `${material.id}-q3`,
-      question: 'Какой подход к коммуникации изменений считается устойчивым?',
-      options: ['Разовое объявление', 'Регулярный цикл сообщений и обратной связи', 'Коммуникация только через руководителя проекта'],
+      question: t('courseBasics.quiz.q3'),
+      options: tm<string[]>('courseBasics.quiz.q3_options'),
       correctIndex: 1,
-      explanation: 'Ритм и обратная связь снижают сопротивление и удерживают фокус команды.',
+      explanation: t('courseBasics.quiz.e3'),
     },
     {
       id: `${material.id}-q4`,
-      question: 'Что подтверждает успешность практического внедрения?',
-      options: ['Измеримый результат пилота и назначенный владелец', 'Презентация без метрик', 'Одобрение без проверки'],
+      question: t('courseBasics.quiz.q4'),
+      options: tm<string[]>('courseBasics.quiz.q4_options'),
       correctIndex: 0,
-      explanation: 'Пилот должен иметь измеримый эффект и ответственного за масштабирование.',
+      explanation: t('courseBasics.quiz.e4'),
     },
     {
       id: `${material.id}-q5`,
-      question: 'Как закрепить результат после прохождения курса?',
-      options: ['Ограничиться обучением', 'Оставить изменения на уровне инициативы', 'Встроить практики в стандарты и регулярный контроль'],
+      question: t('courseBasics.quiz.q5'),
+      options: tm<string[]>('courseBasics.quiz.q5_options'),
       correctIndex: 2,
-      explanation: 'Устойчивость появляется только после интеграции в рабочую систему управления.',
+      explanation: t('courseBasics.quiz.e5'),
     },
   ];
 
@@ -365,7 +309,7 @@ export default function CourseBasicsPage() {
             <p className="text-xs text-muted-foreground">{media.description}</p>
             <div className="rounded-lg border border-border bg-muted/50 p-4">
               <audio controls className="w-full" src={media.url}>
-                Ваш браузер не поддерживает аудио.
+                {t('courseBasics.ui.audioNotSupported')}
               </audio>
             </div>
           </div>
@@ -399,13 +343,13 @@ export default function CourseBasicsPage() {
             <p className="text-sm text-muted-foreground">{courseSummary}</p>
           </div>
           <Badge variant="secondary" className="text-xs shrink-0">
-            <Clock className="h-3 w-3 mr-1" /> ~{totalDuration} мин
+            <Clock className="h-3 w-3 mr-1" /> ~{totalDuration} {t('courseBasics.ui.minutes')}
           </Badge>
         </div>
         <div className="flex items-center gap-3">
           <Progress value={overallPercent} className="h-2 flex-1" />
           <span className="text-sm font-bold text-primary whitespace-nowrap">{overallPercent}%</span>
-          <span className="text-xs text-muted-foreground whitespace-nowrap">{completedLessonsCount}/{lessons.length} занятий</span>
+          <span className="text-xs text-muted-foreground whitespace-nowrap">{completedLessonsCount}/{lessons.length} {t('courseBasics.ui.lessons')}</span>
         </div>
       </div>
 
@@ -442,7 +386,7 @@ export default function CourseBasicsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="truncate">{lesson.shortTitle}</p>
-                      <p className="text-xs text-muted-foreground">{lesson.durationMin} мин</p>
+                      <p className="text-xs text-muted-foreground">{lesson.durationMin} {t('courseBasics.ui.minutes')}</p>
                     </div>
                   </button>
                 );
@@ -471,8 +415,8 @@ export default function CourseBasicsPage() {
                   )}
                 </div>
                 <div className="flex-1">
-                  <p>Финальный квест</p>
-                  {questSubmitted && <p className="text-xs text-green-600">{questScore}/{quizQuestions.length} правильных</p>}
+                  <p>{t('courseBasics.ui.finalQuest')}</p>
+                  {questSubmitted && <p className="text-xs text-green-600">{t('courseBasics.ui.correctAnswers', { score: questScore, total: quizQuestions.length })}</p>}
                 </div>
               </button>
             </div>
@@ -485,9 +429,9 @@ export default function CourseBasicsPage() {
               <>
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <Badge variant="secondary" className="text-xs">Занятие {activeLesson + 1}</Badge>
+                    <Badge variant="secondary" className="text-xs">{t('courseBasics.ui.lesson', { n: activeLesson + 1 })}</Badge>
                     <Badge variant="outline" className="text-xs">
-                      <Clock className="h-3 w-3 mr-1" /> {currentLesson.durationMin} мин
+                      <Clock className="h-3 w-3 mr-1" /> {currentLesson.durationMin} {t('courseBasics.ui.minutes')}
                     </Badge>
                   </div>
                   <h2 className="text-2xl font-bold text-foreground mt-2">{currentLesson.title}</h2>
@@ -499,7 +443,7 @@ export default function CourseBasicsPage() {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4 text-primary" />
-                    <h3 className="text-lg font-semibold text-foreground">Материал занятия</h3>
+                    <h3 className="text-lg font-semibold text-foreground">{t('courseBasics.ui.lessonMaterial')}</h3>
                   </div>
                   <p className="text-foreground leading-relaxed">{currentLesson.content}</p>
                   {currentLesson.longread.map((paragraph, i) => (
@@ -525,7 +469,7 @@ export default function CourseBasicsPage() {
 
                 <div className="space-y-3">
                   <Separator />
-                  <h3 className="text-lg font-semibold text-foreground">Практические шаги</h3>
+                  <h3 className="text-lg font-semibold text-foreground">{t('courseBasics.ui.practical')}</h3>
                   <div className="space-y-2">
                     {currentLesson.checklist.map((item, i) => (
                       <label
@@ -553,17 +497,17 @@ export default function CourseBasicsPage() {
                     disabled={activeLesson === 0}
                     onClick={() => setActiveLesson(prev => prev - 1)}
                   >
-                    <ArrowLeft className="h-4 w-4 mr-1" /> Назад
+                    <ArrowLeft className="h-4 w-4 mr-1" /> {t('courseBasics.ui.back')}
                   </Button>
 
                   <div className="flex gap-2">
                     {!completedLessonIds.has(lessons[activeLesson].id) ? (
                       <Button size="sm" onClick={() => markLessonComplete(activeLesson)}>
-                        <CheckCircle2 className="h-4 w-4 mr-1" /> Завершить занятие
+                        <CheckCircle2 className="h-4 w-4 mr-1" /> {t('courseBasics.ui.completeLesson')}
                       </Button>
                     ) : (
                       <Badge className="bg-green-100 text-green-800 px-3 py-1.5">
-                        <CheckCircle2 className="h-3 w-3 mr-1" /> Пройдено
+                        <CheckCircle2 className="h-3 w-3 mr-1" /> {t('courseBasics.ui.completed')}
                       </Badge>
                     )}
                   </div>
@@ -574,7 +518,7 @@ export default function CourseBasicsPage() {
                     disabled={activeLesson === lessons.length - 1 || !completedLessonIds.has(lessons[activeLesson].id)}
                     onClick={() => setActiveLesson(prev => prev + 1)}
                   >
-                    Далее <ArrowRight className="h-4 w-4 ml-1" />
+                    {t('courseBasics.ui.next')} <ArrowRight className="h-4 w-4 ml-1" />
                   </Button>
                 </div>
               </>
@@ -583,9 +527,9 @@ export default function CourseBasicsPage() {
                 <CardHeader>
                   <div className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-primary" />
-                    <CardTitle>Финальный квест</CardTitle>
+                    <CardTitle>{t('courseBasics.ui.finalQuest')}</CardTitle>
                   </div>
-                  <p className="text-sm text-muted-foreground">Ответьте на вопросы, чтобы закрепить знания курса</p>
+                  <p className="text-sm text-muted-foreground">{t('courseBasics.ui.questSubtitle')}</p>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   {quizQuestions.map((q, qi) => (
@@ -633,17 +577,17 @@ export default function CourseBasicsPage() {
                       disabled={questAnswers.some(a => a === null)}
                       onClick={handleQuestSubmit}
                     >
-                      <Trophy className="h-4 w-4 mr-2" /> Отправить ответы
+                      <Trophy className="h-4 w-4 mr-2" /> {t('courseBasics.ui.submitAnswers')}
                     </Button>
                   ) : (
                     <div className="text-center space-y-2">
                       <p className="text-lg font-bold text-foreground">
-                        Результат: {questScore}/{quizQuestions.length}
+                        {t('courseBasics.ui.result', { score: questScore, total: quizQuestions.length })}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        {questScore >= 4 ? 'Отлично! Вы хорошо усвоили материал.' :
-                         questScore >= 3 ? 'Хороший результат. Повторите отдельные темы.' :
-                         'Рекомендуем пройти занятия еще раз.'}
+                        {questScore >= 4 ? t('courseBasics.ui.resultHigh') :
+                         questScore >= 3 ? t('courseBasics.ui.resultMid') :
+                         t('courseBasics.ui.resultLow')}
                       </p>
                     </div>
                   )}

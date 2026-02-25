@@ -1,18 +1,19 @@
-import { useAuthStore } from '@/stores/auth-store';
+﻿import { useAuthStore } from '@/stores/auth-store';
 import { useAppStore } from '@/stores/app-store';
-import { mockTemplates, mockFeedback } from '@/data/mock-data';
+import { mockTemplates } from '@/data/mock-data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { FolderKanban, GitBranch, MessageSquare, Users, TrendingUp, CheckCircle2 } from 'lucide-react';
+import { FolderKanban, MessageSquare, TrendingUp, CheckCircle2 } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { t } from '@/lib/i18n';
 
 const statusLabels: Record<string, string> = {
-  planning: 'Планирование',
-  in_progress: 'В работе',
-  on_hold: 'На паузе',
-  completed: 'Завершён',
-  cancelled: 'Отменён',
+  planning: t('dashboard.status.planning'),
+  in_progress: t('dashboard.status.in_progress'),
+  on_hold: t('dashboard.status.on_hold'),
+  completed: t('dashboard.status.completed'),
+  cancelled: t('dashboard.status.cancelled'),
 };
 
 const statusColors: Record<string, string> = {
@@ -29,27 +30,25 @@ export default function DashboardPage() {
 
   const activeProjects = projects.filter(p => p.status === 'in_progress');
   const completedProjects = projects.filter(p => p.status === 'completed');
-  const avgProgress = projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + p.progress_percent, 0) / projects.length) : 0;
 
   const sentimentData = [
-    { name: 'Позитивные', value: feedback.filter(f => f.sentiment === 'positive').length, color: 'hsl(142, 76%, 36%)' },
-    { name: 'Нейтральные', value: feedback.filter(f => f.sentiment === 'neutral').length, color: 'hsl(38, 92%, 50%)' },
-    { name: 'Негативные', value: feedback.filter(f => f.sentiment === 'negative').length, color: 'hsl(0, 84%, 60%)' },
+    { name: t('dashboard.sentiment.positive'), value: feedback.filter(f => f.sentiment === 'positive').length, color: 'hsl(142, 76%, 36%)' },
+    { name: t('dashboard.sentiment.neutral'), value: feedback.filter(f => f.sentiment === 'neutral').length, color: 'hsl(38, 92%, 50%)' },
+    { name: t('dashboard.sentiment.negative'), value: feedback.filter(f => f.sentiment === 'negative').length, color: 'hsl(0, 84%, 60%)' },
   ];
 
   const projectProgressData = projects.map(p => ({
-    name: p.name.length > 15 ? p.name.slice(0, 15) + '...' : p.name,
+    name: p.name.length > 15 ? `${p.name.slice(0, 15)}...` : p.name,
     progress: p.progress_percent,
   }));
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Добро пожаловать, {user?.full_name?.split(' ')[0]}!</h1>
-        <p className="text-muted-foreground">Обзор программы изменений вашей организации</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('dashboard.welcome', { name: user?.full_name?.split(' ')[0] || '' })}</h1>
+        <p className="text-muted-foreground">{t('dashboard.subtitle')}</p>
       </div>
 
-      {/* Stats cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 flex items-center gap-4">
@@ -58,7 +57,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{projects.length}</p>
-              <p className="text-xs text-muted-foreground">Всего проектов</p>
+              <p className="text-xs text-muted-foreground">{t('dashboard.stats.totalProjects')}</p>
             </div>
           </CardContent>
         </Card>
@@ -69,7 +68,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{activeProjects.length}</p>
-              <p className="text-xs text-muted-foreground">Активных</p>
+              <p className="text-xs text-muted-foreground">{t('dashboard.stats.active')}</p>
             </div>
           </CardContent>
         </Card>
@@ -80,7 +79,7 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{completedProjects.length}</p>
-              <p className="text-xs text-muted-foreground">Завершённых</p>
+              <p className="text-xs text-muted-foreground">{t('dashboard.stats.completed')}</p>
             </div>
           </CardContent>
         </Card>
@@ -91,17 +90,16 @@ export default function DashboardPage() {
             </div>
             <div>
               <p className="text-2xl font-bold">{feedback.length}</p>
-              <p className="text-xs text-muted-foreground">Отзывов</p>
+              <p className="text-xs text-muted-foreground">{t('dashboard.stats.feedback')}</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Project progress chart */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Прогресс проектов</CardTitle>
+            <CardTitle className="text-base">{t('dashboard.charts.projectProgress')}</CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
@@ -116,11 +114,10 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Sentiment pie */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-base">Анализ настроений</CardTitle>
-            <CardDescription>Тональность обратной связи сотрудников</CardDescription>
+            <CardTitle className="text-base">{t('dashboard.charts.sentiment')}</CardTitle>
+            <CardDescription>{t('dashboard.charts.sentimentDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex items-center justify-center">
             <ResponsiveContainer width="100%" height={250}>
@@ -137,15 +134,14 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      {/* Recent projects */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Текущие проекты</CardTitle>
+          <CardTitle className="text-base">{t('dashboard.recentProjects')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
             {projects.map(project => {
-              const template = mockTemplates.find(t => t.id === project.template_id);
+              const template = mockTemplates.find(tp => tp.id === project.template_id);
               return (
                 <div key={project.id} className="flex items-center gap-4 p-3 rounded-lg border border-border/50 hover:bg-accent/30 transition-colors">
                   <div className="h-10 w-10 rounded-lg flex items-center justify-center text-primary-foreground text-xs font-bold" style={{ backgroundColor: template?.color }}>
