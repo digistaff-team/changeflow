@@ -1,32 +1,58 @@
 import { create } from 'zustand';
 import type { User } from '@/types';
-import { mockUsers } from '@/data/mock-data';
+import { api } from '@/lib/api';
+import { clearAuthToken, getAuthToken, setAuthToken } from '@/lib/auth-token';
+import { useAppStore } from '@/stores/app-store';
 
 interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string) => boolean;
+  isInitializing: boolean;
+  login: (email: string) => Promise<boolean>;
   logout: () => void;
-  switchRole: (role: User['role']) => void;
+  switchRole: (role: User['role']) => Promise<void>;
+  initializeAuth: () => Promise<void>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
-  login: (email: string) => {
-    const found = mockUsers.find(u => u.email === email);
-    if (found) {
-      set({ user: found, isAuthenticated: true });
+  isInitializing: true,
+  login: async (email: string) => {
+    try {
+      const { token, user } = await api.login(email);
+      setAuthToken(token);
+      set({ user, isAuthenticated: true });
       return true;
+    } catch {
+      return false;
     }
-    // Default login: pick first user matching or admin
-    const defaultUser = mockUsers[0];
-    set({ user: defaultUser, isAuthenticated: true });
-    return true;
   },
-  logout: () => set({ user: null, isAuthenticated: false }),
-  switchRole: (role) => {
-    const roleUser = mockUsers.find(u => u.role === role);
-    if (roleUser) set({ user: roleUser, isAuthenticated: true });
+  logout: () => {
+    clearAuthToken();
+    useAppStore.getState().reset();
+    set({ user: null, isAuthenticated: false });
+  },
+  switchRole: async (role) => {
+    const { user, token } = await api.switchRole(role);
+    if (token) {
+      setAuthToken(token);
+    }
+    set({ user, isAuthenticated: true });
+  },
+  initializeAuth: async () => {
+    const token = getAuthToken();
+    if (!token) {
+      set({ isInitializing: false, isAuthenticated: false, user: null });
+      return;
+    }
+
+    try {
+      const { user } = await api.me(token);
+      set({ user, isAuthenticated: true, isInitializing: false });
+    } catch {
+      clearAuthToken();
+      set({ user: null, isAuthenticated: false, isInitializing: false });
+    }
   },
 }));

@@ -36,6 +36,19 @@ npm i
 npm run dev
 ```
 
+### Run Backend API (Persistence + Token Auth)
+
+```sh
+# Terminal 1: start API server (JSON DB + Bearer token auth)
+npm run api
+
+# Terminal 2: start frontend
+npm run dev
+```
+
+By default frontend uses `http://localhost:4000/api`.
+You can override it with `VITE_API_URL`.
+
 **Edit a file directly in GitHub**
 
 - Navigate to the desired file(s).

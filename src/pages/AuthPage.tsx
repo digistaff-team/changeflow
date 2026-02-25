@@ -12,15 +12,19 @@ export default function AuthPage() {
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    login(email);
-    navigate('/dashboard');
+    const success = await login(email);
+    if (success) {
+      navigate('/dashboard');
+    }
   };
 
-  const quickLogin = (email: string) => {
-    login(email);
-    navigate('/dashboard');
+  const quickLogin = async (email: string) => {
+    const success = await login(email);
+    if (success) {
+      navigate('/dashboard');
+    }
   };
 
   return (
